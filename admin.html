@@ -1,300 +1,297 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>IBSS Bookings — Admin</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Syne:wght@600;700&display=swap" rel="stylesheet">
+<html lang="en"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IBSS Bookings — Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--navy:#05060a;--card:#0b0d14;--card2:#11141f;--teal:#00E5B4;--blue:#00BFFF;--amber:#FFB020;--pink:#ff5da2;--green:#3ddc84;--line:rgba(255,255,255,.16);--mut:#7a8295}
+:root{--bg:#f4f7f8;--card:#ffffff;--card2:#eef3f4;--fg:#15202b;--mut:#5a6b76;--teal:#00a88f;--blue:#0077b6;--amber:#c97d00;--pink:#d6447f;--green:#0a9d6b;--line:rgba(20,40,50,.14)}
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Space Grotesk',sans-serif;background:var(--navy);color:#fff;padding:28px 18px 60px;-webkit-font-smoothing:antialiased}
-.wrap{max-width:1080px;margin:0 auto}
-.top{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:8px}
-.logo{height:46px;width:auto;display:block;margin-bottom:10px}
-.eyebrow{font-family:'Space Grotesk',sans-serif;font-weight:700;letter-spacing:.24em;text-transform:uppercase;font-size:.72rem;color:var(--teal)}
-h1{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:clamp(1.8rem,5vw,2.8rem);line-height:1;margin:6px 0}
-.sub{color:var(--mut);font-size:.95rem;margin-bottom:24px}
-
-/* login */
-.login{max-width:380px;margin:8vh auto 0;background:var(--card);border:1px solid var(--line);border-radius:0;padding:28px}
-.login h2{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:1.5rem;margin-bottom:4px}
-.login p{color:var(--mut);font-size:.9rem;margin-bottom:16px}
-label{display:block;font-size:.8rem;font-weight:600;color:var(--mut);margin:12px 0 5px}
-input{width:100%;background:var(--navy);border:1px solid var(--line);border-radius:0;padding:12px;color:#fff;font-family:'DM Sans';font-size:1rem}
-input:focus{outline:none;border-color:var(--teal)}
-.btn{font-family:'DM Sans';font-weight:700;font-size:.95rem;border:none;border-radius:0;padding:11px 18px;cursor:pointer;transition:.14s}
-.btn-primary{background:var(--teal);color:var(--navy)}
-.btn-primary:hover{filter:brightness(1.08)}
-.btn-ghost{background:transparent;color:#fff;border:1px solid var(--line)}
-.btn-sm{padding:7px 12px;font-size:.82rem;border-radius:8px}
-.btn-confirm{background:var(--green);color:var(--navy)}
-.btn-cancel{background:transparent;color:var(--pink);border:1px solid var(--pink)}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap}
-.err{color:var(--pink);font-size:.85rem;margin-top:10px;min-height:1em}
-
-/* stats */
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:22px}
-.stat{background:var(--card);border:1px solid var(--line);border-radius:0;padding:16px}
-.stat .n{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:1.9rem;line-height:1}
-.stat .l{color:var(--mut);font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;margin-top:4px}
-.stat.tealv .n{color:var(--teal)}.stat.amberv .n{color:var(--amber)}.stat.greenv .n{color:var(--green)}.stat.bluev .n{color:var(--blue)}
-
-/* filters */
-.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.chip{background:var(--card);border:1px solid var(--line);color:var(--mut);border-radius:0;padding:7px 15px;font-size:.85rem;font-weight:600;cursor:pointer}
-.chip.active{background:var(--teal);color:var(--navy);border-color:var(--teal)}
-
-/* booking cards */
-.list{display:flex;flex-direction:column;gap:12px}
-.bk{background:var(--card);border:1px solid var(--line);border-radius:0;padding:16px 18px;display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
-.bk-main{flex:1;min-width:220px}
-.bk-name{font-family:'Space Grotesk',sans-serif;font-weight:500;font-size:1.2rem}
-.bk-parent{color:var(--mut);font-size:.9rem;margin-top:2px}
-.bk-contact{font-size:.86rem;margin-top:8px;display:flex;gap:14px;flex-wrap:wrap}
-.bk-contact a{color:var(--blue);text-decoration:none}
-.bk-days{margin-top:10px;display:flex;gap:6px;flex-wrap:wrap}
-.tag{background:var(--card2);border:1px solid var(--line);border-radius:7px;padding:3px 9px;font-size:.78rem}
-.bk-side{display:flex;flex-direction:column;align-items:flex-end;gap:10px;justify-content:space-between}
-.badge{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:4px 10px;border-radius:0}
-.b-pending{background:rgba(255,176,32,.16);color:var(--amber)}
-.b-confirmed{background:rgba(61,220,132,.16);color:var(--green)}
-.b-cancelled{background:rgba(255,93,162,.16);color:var(--pink)}
-.when{color:var(--mut);font-size:.76rem}
-.empty{text-align:center;color:var(--mut);padding:50px 20px}
+body{font-family:'Space Grotesk',sans-serif;background:var(--bg);color:var(--fg);padding:32px 20px 80px;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto}
+.eyebrow{font-weight:500;font-size:.72rem;letter-spacing:.22em;text-transform:uppercase;color:var(--teal)}
+h1{font-weight:300;font-size:2.2rem;letter-spacing:-.02em;margin:6px 0 4px}
+.sub{color:var(--mut);font-size:.95rem;margin-bottom:22px}
+.card-box{background:var(--card);border:1px solid var(--line);padding:24px;max-width:420px}
+label{display:block;font-size:.78rem;font-weight:500;letter-spacing:.04em;color:var(--mut);margin:12px 0 5px;text-transform:uppercase}
+input,select{width:100%;background:#fff;border:1px solid var(--line);padding:11px;color:var(--fg);font-family:'Space Grotesk';font-size:1rem}
+input:focus,select:focus{outline:none;border-color:var(--teal)}
+.btn{font-family:'Space Grotesk';font-weight:600;font-size:.9rem;border:1px solid var(--teal);padding:11px 18px;cursor:pointer;transition:.12s;background:var(--teal);color:#fff}
+.btn:hover{filter:brightness(1.06)}
+.btn-ghost{background:transparent;color:var(--fg);border-color:var(--line)}
+.btn-ghost:hover{border-color:var(--fg)}
+.btn-sm{font-size:.78rem;padding:7px 12px}
+.btn-confirm{background:var(--green);border-color:var(--green);color:#fff}
+.btn-cancel{background:transparent;border-color:var(--pink);color:var(--pink)}
+.msg{margin-top:12px;font-size:.88rem;color:var(--pink)}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:18px}
+.toolbar input,.toolbar select{width:auto;min-width:150px}
+.tabs{display:flex;gap:6px;margin-bottom:18px}
+.tab{font-size:.85rem;font-weight:500;padding:9px 16px;border:1px solid var(--line);background:var(--card);cursor:pointer}
+.tab.active{background:var(--teal);color:#fff;border-color:var(--teal)}
+/* calendar */
+.cal{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.calday{background:var(--card);border:1px solid var(--line);padding:14px;cursor:pointer;transition:.12s;min-height:104px;display:flex;flex-direction:column}
+.calday:hover{border-color:var(--teal);box-shadow:0 4px 14px rgba(0,168,143,.12)}
+.calday.has{border-left:3px solid var(--teal)}
+.calday.sel{border-color:var(--teal);box-shadow:0 0 0 2px var(--teal)}
+.cd-date{font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)}
+.cd-title{font-weight:500;font-size:.96rem;margin:3px 0 8px;line-height:1.1}
+.cd-counts{margin-top:auto;font-size:.78rem;color:var(--mut)}
+.cd-counts b{color:var(--fg)}
+.cd-badge{display:inline-block;background:var(--card2);border:1px solid var(--line);font-size:.7rem;padding:2px 7px;margin-top:6px}
+.cd-badge.allc{background:rgba(10,157,107,.12);border-color:var(--green);color:var(--green)}
+.weeklabel{grid-column:1/-1;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);margin:14px 0 2px;font-weight:500}
+/* day detail */
+.detail{margin-top:24px}
+.detail h2{font-weight:500;font-size:1.4rem;margin-bottom:4px}
+.detail .dsub{color:var(--mut);font-size:.9rem;margin-bottom:16px}
+.client{background:var(--card);border:1px solid var(--line);padding:16px 18px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.client .who{font-weight:500;font-size:1.05rem}
+.client .meta{font-size:.84rem;color:var(--mut);margin-top:3px;line-height:1.5}
+.client .note{font-size:.84rem;color:var(--fg);margin-top:6px;background:var(--card2);padding:7px 10px;border-left:2px solid var(--amber)}
+.client .actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.status-pill{font-size:.72rem;font-weight:600;letter-spacing:.04em;text-transform:uppercase;padding:4px 9px;align-self:center}
+.sp-pending{background:rgba(201,125,0,.12);color:var(--amber);border:1px solid var(--amber)}
+.sp-confirmed{background:rgba(10,157,107,.12);color:var(--green);border:1px solid var(--green)}
+.sp-cancelled{background:rgba(214,68,127,.1);color:var(--pink);border:1px solid var(--pink)}
+.empty{color:var(--mut);padding:20px 0}
 .hidden{display:none}
-.bar{display:flex;gap:10px;align-items:center}
-@media(max-width:620px){.stats{grid-template-columns:repeat(2,1fr)}.bk-side{align-items:flex-start}}
-</style>
-</head>
-<body>
+/* list view (all bookings) */
+.bk{background:var(--card);border:1px solid var(--line);padding:16px 18px;margin-bottom:10px}
+.bk h3{font-weight:500;font-size:1.08rem}
+.bk .meta{font-size:.85rem;color:var(--mut);margin:3px 0 8px;line-height:1.5}
+.bk .days{display:flex;flex-wrap:wrap;gap:6px}
+.daychip{font-size:.78rem;border:1px solid var(--line);padding:5px 9px;display:flex;align-items:center;gap:7px}
+.daychip .dc-confirm{font-size:.7rem;border:1px solid var(--green);background:var(--green);color:#fff;padding:3px 7px;cursor:pointer}
+.daychip.done{background:rgba(10,157,107,.1);border-color:var(--green)}
+.daychip.done .tick{color:var(--green);font-weight:700}
+</style></head><body><div class="wrap">
 
 <!-- LOGIN -->
-<div id="loginView" class="login">
-  <h2>IBSS Admin</h2>
-  <p>Sign in to view and manage holiday bookings.</p>
-  <label for="email">Email</label>
-  <input id="email" type="email" autocomplete="username">
-  <label for="pw">Password</label>
-  <input id="pw" type="password" autocomplete="current-password">
-  <div class="err" id="loginErr"></div>
-  <div style="margin-top:16px"><button class="btn btn-primary" id="loginBtn" style="width:100%">Sign in</button></div>
+<div id="loginView">
+  <div class="eyebrow">IBSS Manager</div>
+  <h1>Bookings</h1>
+  <p class="sub">Sign in to view and manage holiday bookings.</p>
+  <div class="card-box">
+    <label for="email">Email</label><input id="email" type="email" autocomplete="username">
+    <label for="password">Password</label><input id="password" type="password" autocomplete="current-password">
+    <div style="margin-top:18px"><button class="btn" id="signinBtn" style="width:100%">Sign in</button></div>
+    <div class="msg" id="loginMsg"></div>
+  </div>
 </div>
 
 <!-- DASHBOARD -->
-<div id="dashView" class="wrap hidden">
-  <div class="top">
-    <div>
-      <div class="eyebrow">IBSS Winter Holidays 2026</div>
-      <h1>Bookings</h1>
+<div id="dashView" class="hidden">
+  <div class="topbar">
+    <div><div class="eyebrow">IBSS Manager</div><h1>Bookings</h1></div>
+    <button class="btn btn-ghost btn-sm" id="signoutBtn">Sign out</button>
+  </div>
+
+  <div class="tabs">
+    <div class="tab active" data-view="calendar" id="tabCal">Calendar</div>
+    <div class="tab" data-view="list" id="tabList">All bookings</div>
+  </div>
+
+  <div class="toolbar">
+    <select id="programFilter"><option value="2026-winter">Winter Holidays 2026</option></select>
+    <input id="search" type="text" placeholder="Search name / phone / email">
+  </div>
+
+  <!-- CALENDAR VIEW -->
+  <div id="calView">
+    <div class="cal" id="calGrid"></div>
+    <div class="detail hidden" id="dayDetail">
+      <h2 id="ddTitle"></h2>
+      <div class="dsub" id="ddSub"></div>
+      <div id="ddClients"></div>
     </div>
-    <div class="bar">
-      <button class="btn btn-ghost btn-sm" id="refresh">Refresh</button>
-      <button class="btn btn-ghost btn-sm" id="logout">Sign out</button>
-    </div>
-  </div>
-  <p class="sub" id="subline">Loading…</p>
-
-  <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
-    <select id="programSel" style="background:var(--card);border:1px solid var(--line);color:#fff;border-radius:0;padding:10px 13px;font-family:'DM Sans';font-size:.9rem;font-weight:600">
-      <option value="all">All programs</option>
-    </select>
-    <input id="search" type="text" placeholder="Search name, email or phone…" style="flex:1;min-width:200px;background:var(--card);border:1px solid var(--line);color:#fff;border-radius:0;padding:10px 13px;font-family:'DM Sans';font-size:.9rem">
   </div>
 
-  <div class="stats">
-    <div class="stat bluev"><div class="n" id="sTotal">0</div><div class="l">Total bookings</div></div>
-    <div class="stat amberv"><div class="n" id="sPending">0</div><div class="l">Pending</div></div>
-    <div class="stat greenv"><div class="n" id="sConfirmed">0</div><div class="l">Confirmed</div></div>
-    <div class="stat tealv"><div class="n" id="sSpots">0</div><div class="l">Total day spots</div></div>
-  </div>
-
-  <div class="filters">
-    <div class="chip active" data-f="all">All</div>
-    <div class="chip" data-f="pending">Pending</div>
-    <div class="chip" data-f="confirmed">Confirmed</div>
-    <div class="chip" data-f="cancelled">Cancelled</div>
-  </div>
-
-  <div class="list" id="list"></div>
-  <div class="empty hidden" id="empty">No bookings yet.</div>
+  <!-- LIST VIEW -->
+  <div id="listView" class="hidden"></div>
 </div>
 
 <script>
-// ===== CONFIG: same values as index.html =====
 const SUPABASE_URL = "https://weyzaukcbaayxrvtergy.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_raLOpdCwlwOePnPrUtqZ9g_5zO1zeRy";
-// =============================================
-
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const $ = s => document.querySelector(s);
+
+// Winter program day map (id -> date + title), in order
+const WINTER_DAYS = [
+  ['mon1','Mon 29 Jun','Trick Shot Takeover','Week 1'],
+  ['tue1','Tue 30 Jun','Kick It! Soccer','Week 1'],
+  ['wed1','Wed 1 Jul','Shop, Cook & Share','Week 1'],
+  ['thu1','Thu 2 Jul','Movie World','Week 1'],
+  ['fri1','Fri 3 Jul','Twin Falls Trek','Week 1'],
+  ['mon2','Mon 6 Jul','Roll Your Own Sushi','Week 2'],
+  ['tue2','Tue 7 Jul','Sea World','Week 2'],
+  ['wed2','Wed 8 Jul','Bounce Day','Week 2'],
+  ['thu2','Thu 9 Jul','Swap Squad','Week 2'],
+  ['fri2','Fri 10 Jul','123 Boom','Week 2'],
+];
+const DAY_INFO = Object.fromEntries(WINTER_DAYS.map(d=>[d[0],{date:d[1],title:d[2],week:d[3]}]));
+
 let allBookings = [];
-let filter = "all";
-let programFilter = "all";
-let searchTerm = "";
+let currentView = 'calendar';
+let selectedDay = null;
+const $ = s=>document.querySelector(s);
 
-const PROGRAM_LABELS = {
-  "2026-winter":"Winter 2026",
-  "2026-spring":"Spring 2026",
-  "2026-summer":"Summer 2026",
-  "2026-autumn":"Autumn 2026"
-};
-function progLabel(p){ return PROGRAM_LABELS[p] || p; }
-
-function fmtDate(iso){
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-AU',{day:'numeric',month:'short'}) + ' ' +
-         d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'});
-}
-
+// ---- auth ----
 async function checkSession(){
-  const { data:{ session } } = await sb.auth.getSession();
-  if(session){ showDash(); load(); } else { showLogin(); }
+  const { data } = await sb.auth.getSession();
+  if(data.session){ showDash(); } else { showLogin(); }
 }
 function showLogin(){ $('#loginView').classList.remove('hidden'); $('#dashView').classList.add('hidden'); }
-function showDash(){ $('#loginView').classList.add('hidden'); $('#dashView').classList.remove('hidden'); }
+function showDash(){ $('#loginView').classList.add('hidden'); $('#dashView').classList.remove('hidden'); loadBookings(); }
 
-$('#loginBtn').addEventListener('click', async ()=>{
-  const email=$('#email').value.trim(), password=$('#pw').value;
-  $('#loginErr').textContent='';
-  const btn=$('#loginBtn'); btn.disabled=true; btn.textContent='Signing in…';
+$('#signinBtn').addEventListener('click', async ()=>{
+  const email=$('#email').value.trim(), password=$('#password').value;
+  $('#loginMsg').textContent='';
   const { error } = await sb.auth.signInWithPassword({ email, password });
-  btn.disabled=false; btn.textContent='Sign in';
-  if(error){ $('#loginErr').textContent = error.message; return; }
-  showDash(); load();
+  if(error){ $('#loginMsg').textContent = error.message; return; }
+  showDash();
 });
-$('#pw').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#loginBtn').click(); });
+$('#signoutBtn').addEventListener('click', async ()=>{ await sb.auth.signOut(); showLogin(); });
 
-$('#logout').addEventListener('click', async ()=>{ await sb.auth.signOut(); showLogin(); });
-$('#refresh').addEventListener('click', load);
-
-document.querySelectorAll('.chip').forEach(c=>{
-  c.addEventListener('click', ()=>{
-    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));
-    c.classList.add('active'); filter=c.dataset.f; render();
-  });
-});
-$('#programSel').addEventListener('change', e=>{ programFilter=e.target.value; render(); });
-$('#search').addEventListener('input', e=>{ searchTerm=e.target.value.trim().toLowerCase(); render(); });
-
-async function load(){
+// ---- data ----
+async function loadBookings(){
   const { data, error } = await sb.from('bookings').select('*').order('created_at',{ascending:false});
-  if(error){ $('#subline').textContent='Error: '+error.message; return; }
+  if(error){ alert('Could not load bookings: '+error.message); return; }
   allBookings = data||[];
-  // populate program dropdown from data
-  const progs=[...new Set(allBookings.map(b=>b.program).filter(Boolean))];
-  const sel=$('#programSel'); const cur=sel.value;
-  sel.innerHTML='<option value="all">All programs</option>'+progs.map(p=>`<option value="${p}">${progLabel(p)}</option>`).join('');
-  sel.value=progs.includes(cur)||cur==='all'?cur:'all';
-  programFilter=sel.value;
   render();
 }
-
-function scopedByProgram(){
-  return programFilter==='all' ? allBookings : allBookings.filter(b=>b.program===programFilter);
+function filtered(){
+  const q=$('#search').value.trim().toLowerCase();
+  let rows = allBookings.filter(b=>b.program==='2026-winter');
+  if(q) rows = rows.filter(b=>(b.child_name+' '+b.parent_name+' '+b.phone+' '+b.email).toLowerCase().includes(q));
+  return rows;
+}
+function dayStatusOf(b,dayId){
+  if(b.status==='cancelled') return 'cancelled';
+  const ds=b.day_status||{};
+  return ds[dayId]||'pending';
 }
 
-function updateStats(rows){
-  const spots = rows.filter(b=>b.status!=='cancelled').reduce((n,b)=>n+(b.days?.length||0),0);
-  $('#sTotal').textContent = rows.length;
-  $('#sPending').textContent = rows.filter(b=>b.status==='pending').length;
-  $('#sConfirmed').textContent = rows.filter(b=>b.status==='confirmed').length;
-  $('#sSpots').textContent = spots;
-  $('#subline').textContent = rows.length+' booking'+(rows.length===1?'':'s')+
-    (programFilter==='all'?' (all programs)':' · '+progLabel(programFilter))+
-    ' · updated '+new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'});
+// ---- tabs ----
+$('#tabCal').addEventListener('click',()=>switchView('calendar'));
+$('#tabList').addEventListener('click',()=>switchView('list'));
+function switchView(v){
+  currentView=v;
+  $('#tabCal').classList.toggle('active',v==='calendar');
+  $('#tabList').classList.toggle('active',v==='list');
+  $('#calView').classList.toggle('hidden',v!=='calendar');
+  $('#listView').classList.toggle('hidden',v!=='list');
+  render();
+}
+$('#search').addEventListener('input',render);
+
+// ---- render ----
+function render(){ currentView==='calendar' ? renderCalendar() : renderList(); }
+
+function bookingsOnDay(dayId){
+  return filtered().filter(b=>(b.days||[]).includes(dayId));
 }
 
-function render(){
-  let rows = scopedByProgram();
-  updateStats(rows);
-  if(filter!=='all') rows = rows.filter(b=> b.status===filter);
-  if(searchTerm){
-    rows = rows.filter(b=>{
-      const hay=[b.child_name,b.parent_name,b.email,b.phone].join(' ').toLowerCase();
-      return hay.includes(searchTerm);
-    });
-  }
-  const list=$('#list'); list.innerHTML='';
-  $('#empty').classList.toggle('hidden', rows.length>0);
-  rows.forEach(b=>{
-    const titles=(b.day_titles||b.days||[]);
-    const det=b.day_details||{};
-    const days=b.days||[];
-    const dayTags=days.map((id,i)=>{
-      const t=titles[i]||id; const d=det[id];
-      let extra='';
-      if(d&&(d.pickup||d.dropoff||d.note)){
-        const bits=[];
-        if(d.pickup)bits.push('P '+d.pickup);
-        if(d.dropoff)bits.push('D '+d.dropoff);
-        if(d.note)bits.push('📝');
-        extra=` <span style="color:var(--amber);font-size:.72rem">(${bits.join(' · ')})</span>`;
-      }
-      return `<span class="tag">${t}${extra}</span>`;
-    }).join('');
-    // collect notes to show fully
-    const notes=days.map((id,i)=>{
-      const d=det[id]; if(d&&d.note) return `<div style="font-size:.82rem;color:var(--mut);margin-top:4px">📝 <b style="color:#fff">${titles[i]||id}:</b> ${d.note}</div>`; return '';
-    }).join('');
-    const el=document.createElement('div');
-    el.className='bk';
-    el.innerHTML=`
-      <div class="bk-main">
-        <div class="bk-name">${b.child_name} <span style="font-size:.7rem;color:var(--mut);font-weight:500">· ${progLabel(b.program)}</span></div>
-        <div class="bk-parent">Parent: ${b.parent_name}</div>
-        <div class="bk-contact">
-          <a href="tel:${b.phone}">📞 ${b.phone}</a>
-          <a href="mailto:${b.email}">✉️ ${b.email}</a>
-        </div>
-        <div class="bk-days">${dayTags}</div>
-        ${notes}
-      </div>
-      <div class="bk-side">
-        <div>
-          <span class="badge b-${b.status}">${b.status}</span>
-          <div class="when">${fmtDate(b.created_at)}</div>
-        </div>
-        <div class="btn-row">
-          ${b.status!=='confirmed'?`<button class="btn btn-sm btn-confirm" data-act="confirmed" data-id="${b.id}">Confirm</button>`:''}
-          ${b.status!=='cancelled'?`<button class="btn btn-sm btn-cancel" data-act="cancelled" data-id="${b.id}">Cancel</button>`:''}
-          ${b.status==='cancelled'?`<button class="btn btn-sm btn-ghost" data-act="pending" data-id="${b.id}">Reopen</button>`:''}
-        </div>
-      </div>`;
-    list.appendChild(el);
+function renderCalendar(){
+  const grid=$('#calGrid'); grid.innerHTML='';
+  let lastWeek=null;
+  WINTER_DAYS.forEach(([id,date,title,week])=>{
+    if(week!==lastWeek){
+      const wl=document.createElement('div'); wl.className='weeklabel'; wl.textContent=week; grid.appendChild(wl); lastWeek=week;
+    }
+    const rows=bookingsOnDay(id);
+    const total=rows.length;
+    const confirmed=rows.filter(b=>dayStatusOf(b,id)==='confirmed').length;
+    const cell=document.createElement('div');
+    cell.className='calday'+(total>0?' has':'')+(selectedDay===id?' sel':'');
+    let badge='';
+    if(total>0 && confirmed===total) badge='<span class="cd-badge allc">All confirmed</span>';
+    else if(total>0) badge='<span class="cd-badge">'+(total-confirmed)+' to confirm</span>';
+    cell.innerHTML='<div class="cd-date">'+date+'</div><div class="cd-title">'+title+'</div>'+
+      '<div class="cd-counts">'+(total?('<b>'+total+'</b> booked · '+confirmed+' confirmed'):'No bookings yet')+'</div>'+badge;
+    cell.addEventListener('click',()=>{ selectedDay=id; renderCalendar(); renderDayDetail(id); });
+    grid.appendChild(cell);
   });
-  list.querySelectorAll('button[data-act]').forEach(btn=>{
-    btn.addEventListener('click', async ()=>{
-      const id=btn.dataset.id, status=btn.dataset.act;
-      btn.disabled=true;
-      const { error } = await sb.from('bookings').update({status}).eq('id',id);
-      if(error){ alert('Could not update: '+error.message); btn.disabled=false; return; }
-      const b=allBookings.find(x=>x.id===id); if(b) b.status=status;
-      // On confirm, offer to text the parent
-      if(status==='confirmed'){
-        const bk=allBookings.find(x=>x.id===id);
-        const who=bk?(bk.child_name+' ('+bk.parent_name+')'):'this booking';
-        if(confirm('Text the parent now to confirm '+who+'?')){
-          try{
-            const res=await fetch(SUPABASE_URL+'/functions/v1/confirm-booking',{
-              method:'POST',
-              headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},
-              body:JSON.stringify({booking_id:id})
-            });
-            if(!res.ok) throw new Error('status '+res.status);
-            alert('Confirmation text sent to the parent.');
-          }catch(e){ alert('Booking confirmed, but the text failed to send: '+e.message); }
-        }
-      }
-      render();
+  if(selectedDay) renderDayDetail(selectedDay);
+}
+
+function renderDayDetail(dayId){
+  const info=DAY_INFO[dayId];
+  const wrap=$('#dayDetail'); wrap.classList.remove('hidden');
+  $('#ddTitle').textContent=info.title;
+  const rows=bookingsOnDay(dayId);
+  $('#ddSub').textContent=info.date+' · '+rows.length+' booked';
+  const box=$('#ddClients'); box.innerHTML='';
+  if(rows.length===0){ box.innerHTML='<div class="empty">No clients booked for this outing yet.</div>'; return; }
+  rows.forEach(b=>{
+    const st=dayStatusOf(b,dayId);
+    const dd=(b.day_details||{})[dayId]||{};
+    const times=(dd.pickup||dd.dropoff)?('Pickup '+(dd.pickup||'—')+' · Drop-off '+(dd.dropoff||'—')):'';
+    const el=document.createElement('div'); el.className='client';
+    el.innerHTML=
+      '<div><div class="who">'+b.child_name+'</div>'+
+      '<div class="meta">Parent: '+b.parent_name+' · '+b.phone+'<br>'+(times||'')+'</div>'+
+      (dd.note?('<div class="note">'+dd.note+'</div>'):'')+'</div>'+
+      '<div class="actions">'+
+        '<span class="status-pill sp-'+st+'">'+st+'</span>'+
+        (st!=='confirmed' && b.status!=='cancelled' ? '<button class="btn btn-sm btn-confirm" data-confirm="'+b.id+'" data-day="'+dayId+'">Confirm</button>' : '')+
+      '</div>';
+    box.appendChild(el);
+  });
+  box.querySelectorAll('button[data-confirm]').forEach(btn=>{
+    btn.addEventListener('click',()=>confirmDay(btn.dataset.confirm, btn.dataset.day, btn));
+  });
+}
+
+async function confirmDay(bookingId, dayId, btn){
+  const info=DAY_INFO[dayId];
+  const b=allBookings.find(x=>x.id===bookingId);
+  const who=b?b.child_name:'this client';
+  const notify=confirm('Confirm '+who+' for '+info.title+' ('+info.date+')?\n\nOK = confirm AND text the parent.\nCancel = stop (nothing changes).');
+  if(!notify) return;
+  btn.disabled=true; btn.textContent='…';
+  try{
+    const res=await fetch(SUPABASE_URL+'/functions/v1/confirm-day',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+SUPABASE_ANON_KEY},
+      body:JSON.stringify({booking_id:bookingId, day_id:dayId, day_title:info.title, notify:true})
     });
+    const j=await res.json();
+    if(!res.ok) throw new Error(j.error||('status '+res.status));
+    // update local copy
+    if(b){ b.day_status=b.day_status||{}; b.day_status[dayId]='confirmed'; }
+    renderCalendar();
+  }catch(e){
+    alert('Could not confirm: '+e.message); btn.disabled=false; btn.textContent='Confirm';
+  }
+}
+
+function renderList(){
+  const box=$('#listView'); box.innerHTML='';
+  const rows=filtered();
+  if(rows.length===0){ box.innerHTML='<div class="empty">No bookings yet.</div>'; return; }
+  rows.forEach(b=>{
+    const el=document.createElement('div'); el.className='bk';
+    const chips=(b.days||[]).map(id=>{
+      const info=DAY_INFO[id]||{title:id,date:''};
+      const st=dayStatusOf(b,id);
+      if(st==='confirmed') return '<span class="daychip done"><span class="tick">✓</span> '+info.title+'</span>';
+      if(b.status==='cancelled') return '<span class="daychip">'+info.title+'</span>';
+      return '<span class="daychip">'+info.title+' <button class="dc-confirm" data-confirm="'+b.id+'" data-day="'+id+'">Confirm</button></span>';
+    }).join('');
+    el.innerHTML='<h3>'+b.child_name+'</h3>'+
+      '<div class="meta">Parent: '+b.parent_name+' · '+b.phone+' · '+b.email+'</div>'+
+      '<div class="days">'+chips+'</div>';
+    box.appendChild(el);
+  });
+  box.querySelectorAll('button[data-confirm]').forEach(btn=>{
+    btn.addEventListener('click',()=>confirmDay(btn.dataset.confirm, btn.dataset.day, btn));
   });
 }
 
 checkSession();
 </script>
-</body>
-</html>
+</body></html>
