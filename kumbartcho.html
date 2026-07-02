@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kumbartcho Spotting Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F6F2;
+    --card:#FFFFFF;
+    --ink:#173733;
+    --ink-soft:#5B726E;
+    --teal:#178C86;
+    --teal-deep:#0F5F5A;
+    --teal-tint:#E3F1EF;
+    --sun:#F2A63B;
+    --line:#E4E7E4;
+    --shadow:0 1px 2px rgba(23,55,51,.05),0 6px 20px rgba(23,55,51,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Space Grotesk',system-ui,sans-serif;
+    background:var(--paper);
+    color:var(--ink);
+    line-height:1.4;
+    -webkit-font-smoothing:antialiased;
+    padding-bottom:64px;
+  }
+
+  /* ---------- name gate ---------- */
+  .gate{
+    position:fixed;inset:0;z-index:50;
+    background:var(--paper);
+    display:flex;flex-direction:column;justify-content:center;
+    padding:32px 26px;gap:8px;
+  }
+  .gate.hide{display:none}
+  .gate .eyebrow{font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+  .gate h1{font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1.1;margin-bottom:2px}
+  .gate p{font-size:14px;color:var(--ink-soft);margin-bottom:18px;max-width:32ch}
+  .gate label{font-size:13px;font-weight:600;margin-bottom:6px}
+  .gate input{
+    font-family:inherit;font-size:17px;font-weight:500;color:var(--ink);
+    padding:14px 16px;border:1px solid var(--line);border-radius:14px;
+    background:var(--card);width:100%;max-width:420px;
+  }
+  .gate input:focus{outline:3px solid var(--teal);outline-offset:1px;border-color:var(--teal)}
+  .gate button{
+    margin-top:14px;font-family:inherit;font-size:16px;font-weight:600;
+    background:var(--teal);color:#fff;border:none;border-radius:99px;
+    padding:14px 26px;cursor:pointer;align-self:flex-start;
+  }
+  .gate button:active{background:var(--teal-deep)}
+  .gate small{margin-top:12px;font-size:12px;color:var(--ink-soft)}
+
+  /* ---------- header ---------- */
+  header{
+    position:sticky;top:0;z-index:10;
+    background:var(--paper);
+    padding:16px 20px 14px;
+    border-bottom:1px solid var(--line);
+  }
+  .eyebrow{
+    font-size:12px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--teal);margin-bottom:4px;
+  }
+  .headrow{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+  h1{font-size:24px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+  .who{font-size:13px;color:var(--ink-soft);margin-top:5px}
+  .who b{color:var(--teal-deep);font-weight:600}
+  .switch{
+    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
+    font-family:inherit;font-size:12px;font-weight:600;
+    padding:7px 12px;border-radius:99px;cursor:pointer;white-space:nowrap;flex-shrink:0;
+  }
+  .switch:active{background:var(--paper)}
+
+  .tracker{display:flex;align-items:center;gap:12px;margin-top:13px}
+  .count{font-size:15px;font-weight:600;white-space:nowrap}
+  .count b{color:var(--teal);font-size:19px}
+  .bar{flex:1;height:8px;border-radius:99px;background:var(--teal-tint);overflow:hidden}
+  .bar-fill{height:100%;width:0%;border-radius:99px;background:var(--teal);transition:width .4s ease}
+  .reset{
+    border:1px solid var(--line);background:var(--card);color:var(--ink-soft);
+    font-family:inherit;font-size:12px;font-weight:600;
+    padding:7px 12px;border-radius:99px;cursor:pointer;white-space:nowrap;
+  }
+  .reset:active{background:var(--paper)}
+  .savenote{font-size:11px;color:var(--ink-soft);margin-top:8px}
+
+  /* ---------- sections ---------- */
+  main{padding:20px 16px 0}
+  .section{margin-bottom:28px}
+  .section-head{display:flex;align-items:baseline;gap:8px;margin:0 4px 12px}
+  .section-head h2{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .section-head span{font-size:12px;color:var(--ink-soft)}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  @media(min-width:560px){.grid{grid-template-columns:repeat(3,1fr)}}
+  @media(min-width:820px){.grid{grid-template-columns:repeat(4,1fr)}}
+
+  /* ---------- cards ---------- */
+  .card{
+    position:relative;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:15px 14px 14px;box-shadow:var(--shadow);
+    cursor:pointer;transition:transform .12s ease,border-color .18s ease,background .18s ease;
+    -webkit-tap-highlight-color:transparent;
+    display:flex;flex-direction:column;gap:6px;min-height:132px;
+  }
+  .card:active{transform:scale(.97)}
+  .card:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+  .icon{font-size:32px;line-height:1}
+  .name{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .hint{font-size:12px;color:var(--ink-soft);line-height:1.35;flex:1}
+  .chip{
+    align-self:flex-start;font-size:10px;font-weight:600;letter-spacing:.06em;
+    text-transform:uppercase;padding:3px 8px;border-radius:99px;
+    background:var(--teal-tint);color:var(--teal-deep);
+  }
+  .chip.lucky{background:#FBEBD3;color:#9A631A}
+  .chip.listen{background:#E7EEF9;color:#33568F}
+
+  .card.found{background:var(--teal);border-color:var(--teal)}
+  .card.found .name,.card.found .icon{color:#fff}
+  .card.found .hint{color:rgba(255,255,255,.82)}
+  .card.found .chip{background:rgba(255,255,255,.22);color:#fff}
+  .tick{
+    position:absolute;top:11px;right:11px;width:24px;height:24px;border-radius:50%;
+    background:#fff;color:var(--teal);display:grid;place-items:center;
+    font-size:14px;font-weight:700;opacity:0;transform:scale(.4);
+    transition:opacity .18s ease,transform .18s ease;
+  }
+  .card.found .tick{opacity:1;transform:scale(1)}
+
+  .done{
+    margin:8px 4px 0;padding:16px 18px;border-radius:18px;
+    background:var(--teal-tint);border:1px dashed var(--teal);text-align:center;
+    font-size:14px;font-weight:500;color:var(--teal-deep);display:none;
+  }
+  .done.show{display:block}
+  .footnote{margin:26px 6px 0;font-size:11px;color:var(--ink-soft);line-height:1.5}
+
+  @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<!-- name gate -->
+<div class="gate" id="gate">
+  <div class="eyebrow">IBSS Nature Walk</div>
+  <h1>Kumbartcho Spotting Sheet</h1>
+  <p>Type your name so your spots get saved just for you.</p>
+  <label for="nameField">Your name</label>
+  <input id="nameField" type="text" autocomplete="off" placeholder="e.g. Alex" enterkeyhint="go">
+  <button id="startBtn">Start spotting →</button>
+  <small id="savemsg"></small>
+</div>
+
+<header>
+  <div class="eyebrow">IBSS Nature Walk</div>
+  <div class="headrow">
+    <div>
+      <h1>Kumbartcho Spotting Sheet</h1>
+      <div class="who">Spotting as <b id="whoName">—</b></div>
+    </div>
+    <button class="switch" id="switchBtn">Switch name</button>
+  </div>
+  <div class="tracker">
+    <div class="count"><b id="found-n">0</b> of <span id="total-n">0</span> spotted</div>
+    <div class="bar"><div class="bar-fill" id="bar"></div></div>
+    <button class="reset" id="reset">Reset</button>
+  </div>
+  <div class="savenote" id="saveline"></div>
+</header>
+
+<main>
+  <div class="done" id="done">🌿 Legend! You spotted the whole sheet. Big walk.</div>
+
+  <section class="section" id="s-critters">
+    <div class="section-head"><h2>Critters near the water</h2><span>look low &amp; quiet</span></div>
+    <div class="grid"></div>
+  </section>
+  <section class="section" id="s-birds">
+    <div class="section-head"><h2>Birds &amp; the sky</h2><span>look up</span></div>
+    <div class="grid"></div>
+  </section>
+  <section class="section" id="s-little">
+    <div class="section-head"><h2>Little things</h2><span>easy to miss</span></div>
+    <div class="grid"></div>
+  </section>
+  <section class="section" id="s-places">
+    <div class="section-head"><h2>Trees &amp; landmarks</h2><span>along the track</span></div>
+    <div class="grid"></div>
+  </section>
+  <section class="section" id="s-fairy">
+    <div class="section-head"><h2>Fairy village bonus</h2><span>hidden around the sanctuary</span></div>
+    <div class="grid"></div>
+  </section>
+
+  <p class="footnote">
+    Kumbartcho Sanctuary, Eatons Hill. Open 7am–7pm. Everything on this sheet really lives here —
+    but wildlife is wild, so seeing it is never guaranteed. A quiet, slow walk gives you the best chance.
+  </p>
+</main>
+
+<script>
+const DATA = {
+  "s-critters":[
+    {i:"🐢",n:"Freshwater turtle",h:"Basking on logs or drifting near the lake edge.",c:"Keep looking"},
+    {i:"🐸",n:"Green frog",h:"Try Frog Hollow — listen for a croak first.",c:"Listen",t:"listen"},
+    {i:"🦎",n:"Lizard or water dragon",h:"Sunning on warm rocks or path edges.",c:"Common"},
+    {i:"🦃",n:"Brush turkey",h:"Struts the paths. Look for its big leaf-mound nest.",c:"Common"},
+    {i:"🐨",n:"Koala",h:"Up high — check the koala viewing platform.",c:"Lucky spot",t:"lucky"},
+    {i:"🦫",n:"Platypus",h:"South Pine River, only very early or late in the day.",c:"Lucky spot",t:"lucky"},
+    {i:"🦆",n:"Duck on the water",h:"Paddling around Kumbartcho Lake.",c:"Common"},
+    {i:"🐍",n:"Snake (look, don't touch)",h:"Spotted from a distance? Freeze, admire, tell a leader.",c:"Lucky spot",t:"lucky"}
+  ],
+  "s-birds":[
+    {i:"🐦",n:"Kookaburra",h:"Big head, loud laugh — often perched watching.",c:"Keep looking"},
+    {i:"🦅",n:"Hawk or eagle",h:"Circling high over the open forest.",c:"Lucky spot",t:"lucky"},
+    {i:"🪶",n:"Any native bird",h:"189 kinds live here — name one you've never seen.",c:"Common"},
+    {i:"🕊️",n:"A water bird",h:"Herons, ducks and more along the river.",c:"Keep looking"}
+  ],
+  "s-little":[
+    {i:"🦗",n:"Cicada song",h:"You'll hear the buzz before you see one.",c:"Listen",t:"listen"},
+    {i:"🦋",n:"Butterfly",h:"Near the flowering plants by the nursery.",c:"Common"},
+    {i:"🐝",n:"Native stingless bee",h:"Tiny and dark, busy on the flowers.",c:"Keep looking"}
+  ],
+  "s-places":[
+    {i:"🌲",n:"Hoop Pine",h:"The tree Kumbartcho is named after.",c:"Common"},
+    {i:"🌳",n:"Bunya Pine",h:"Huge, ancient-looking. Don't stand under the cones!",c:"Keep looking"},
+    {i:"🌉",n:"Suspension bridge",h:"Cross it and feel it move.",c:"Common"},
+    {i:"💧",n:"The South Pine River",h:"Follow the track along the bank.",c:"Common"}
+  ],
+  "s-fairy":[
+    {i:"✉️",n:"Fairy post box",h:"Somewhere in the fairy garden.",c:"Keep looking"},
+    {i:"🍄",n:"Gnome hollow",h:"Peek into the little hidden homes.",c:"Keep looking"},
+    {i:"🐨",n:"Wally the Wombat",h:"Catch him napping in his den.",c:"Lucky spot",t:"lucky"}
+  ]
+};
+
+let total=0, found=0, cards={}, teen="", canSave=true;
+
+/* ---- storage helpers (degrade gracefully if blocked) ---- */
+function storageKey(name){return "kumbartcho:v1:"+name.trim().toLowerCase();}
+function load(name){
+  try{const raw=localStorage.getItem(storageKey(name));return raw?JSON.parse(raw):[];}
+  catch(e){canSave=false;return [];}
+}
+function save(){
+  if(!canSave||!teen) return;
+  try{
+    const done=Object.keys(cards).filter(id=>cards[id].classList.contains('found'));
+    localStorage.setItem(storageKey(teen),JSON.stringify(done));
+  }catch(e){canSave=false;renderSaveline();}
+}
+
+/* ---- build cards ---- */
+function makeCard(id,item){
+  const el=document.createElement('div');
+  el.className='card';el.dataset.id=id;
+  el.setAttribute('role','button');el.setAttribute('tabindex','0');
+  el.setAttribute('aria-pressed','false');
+  const chipClass=item.t?'chip '+item.t:'chip';
+  el.innerHTML=`
+    <div class="tick" aria-hidden="true">✓</div>
+    <div class="icon">${item.i}</div>
+    <div class="name">${item.n}</div>
+    <div class="hint">${item.h}</div>
+    <div class="${chipClass}">${item.c}</div>`;
+  const toggle=()=>{
+    const now=el.classList.toggle('found');
+    el.setAttribute('aria-pressed',now?'true':'false');
+    found+=now?1:-1;update();save();
+  };
+  el.addEventListener('click',toggle);
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();toggle();}});
+  return el;
+}
+
+Object.keys(DATA).forEach(sec=>{
+  const grid=document.querySelector('#'+sec+' .grid');
+  DATA[sec].forEach((item,idx)=>{
+    const id=sec+'-'+idx;
+    const el=makeCard(id,item);
+    cards[id]=el;grid.appendChild(el);total++;
+  });
+});
+document.getElementById('total-n').textContent=total;
+
+function update(){
+  document.getElementById('found-n').textContent=found;
+  document.getElementById('bar').style.width=(found/total*100)+'%';
+  document.getElementById('done').classList.toggle('show',found===total&&total>0);
+}
+function renderSaveline(){
+  const el=document.getElementById('saveline');
+  el.textContent=canSave?'Saved on this device — your spots will still be here if you close it.'
+                        :'Heads up: saving is off in this browser, so a refresh will clear your spots.';
+}
+
+/* ---- start / switch ---- */
+function begin(name){
+  teen=name.trim();
+  document.getElementById('whoName').textContent=teen;
+  // reset all, then apply saved
+  found=0;
+  Object.values(cards).forEach(c=>{c.classList.remove('found');c.setAttribute('aria-pressed','false');});
+  load(teen).forEach(id=>{
+    if(cards[id]){cards[id].classList.add('found');cards[id].setAttribute('aria-pressed','true');found++;}
+  });
+  update();renderSaveline();
+  document.getElementById('gate').classList.add('hide');
+}
+
+const nameField=document.getElementById('nameField');
+document.getElementById('startBtn').addEventListener('click',()=>{
+  const v=nameField.value.trim();
+  if(!v){nameField.focus();return;}
+  begin(v);
+});
+nameField.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();document.getElementById('startBtn').click();}});
+
+document.getElementById('switchBtn').addEventListener('click',()=>{
+  document.getElementById('gate').classList.remove('hide');
+  nameField.value='';nameField.focus();
+});
+
+document.getElementById('reset').addEventListener('click',()=>{
+  Object.values(cards).forEach(c=>{c.classList.remove('found');c.setAttribute('aria-pressed','false');});
+  found=0;update();save();
+});
+
+/* preload last name hint if the device remembers one */
+try{
+  const last=localStorage.getItem('kumbartcho:lastname');
+  if(last) nameField.value=last;
+}catch(e){}
+nameField.addEventListener('blur',()=>{try{if(nameField.value.trim())localStorage.setItem('kumbartcho:lastname',nameField.value.trim());}catch(e){}});
+</script>
+</body>
+</html>
