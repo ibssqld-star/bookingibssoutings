@@ -11,6 +11,7 @@
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --navy-900:#0b1320; --navy-800:#0f1a2b; --navy-700:#16233a; --navy-600:#1b2c46;
@@ -197,6 +198,18 @@
   .coach .cm{width:44px; height:44px; flex-shrink:0;}
   .coach .cw{font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin-bottom:2px;}
   .coach .cl{font-size:13px; line-height:1.35; color:var(--text);}
+  .claim{margin-top:12px;}
+  .claim-label{font-size:11.5px; color:#C4D2E0; text-align:center; margin-bottom:9px; line-height:1.4;}
+  .claim-teams{display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-bottom:11px;}
+  .shot{width:100%; border-radius:12px; border:1px solid var(--line); margin-bottom:10px; max-height:180px; object-fit:cover; display:block;}
+  .claim-actions{display:flex; gap:8px;}
+  .claim-err{color:var(--coral); font-size:11.5px; text-align:center; margin-bottom:9px;}
+  .claim-done{text-align:center; color:var(--teal); font-size:16px; font-weight:700; padding:16px 0;}
+  .hunt-textbtn{width:100%; margin-top:10px; padding:10px; background:transparent; color:var(--muted); font-size:12px;}
+  .thumbs{display:flex; flex-wrap:wrap; gap:7px;}
+  .thumb{width:66px; height:66px; border-radius:10px; overflow:hidden; border:1px solid var(--line); background:var(--navy-900); display:flex; align-items:center; justify-content:center; flex-shrink:0;}
+  .thumb img{width:100%; height:100%; object-fit:cover;}
+  .thumb .noimg{font-size:7.5px; color:var(--muted); text-align:center; padding:4px; font-family:'JetBrains Mono',monospace; line-height:1.2;}
   @media (prefers-reduced-motion: reduce){ .arrow-wrap{transition:none;} .brand .dot{animation:none;} .mascot{animation:none;} .bubble{animation:none;} }
 </style>
 </head>
@@ -204,6 +217,14 @@
 <div id="root"></div>
 <script type="text/babel">
 const { useState, useEffect, useRef } = React;
+
+// ===== SUPABASE — paste your project URL + anon (publishable) key =====
+const SUPABASE_URL = "https://weyzaukcbaayxrvtergy.supabase.co";       // e.g. https://xxxxxxxx.supabase.co
+const SUPABASE_ANON_KEY = "sb_publishable_raLOpdCwlwOePnPrUtqZ9g_5zO1zeRy";  // your anon / publishable key
+const PHOTO_BUCKET = "flag-photos";
+// =====================================================================
+const sb = (SUPABASE_URL && SUPABASE_ANON_KEY && window.supabase)
+  ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
 const store = {
   async get(k){
@@ -364,7 +385,88 @@ const LINES = {
   ],
 };
 
-function HuntView({mission, guide, onClose}){
+function FlagMark(){
+  return (
+    <svg width="170" height="170" viewBox="0 0 100 100" style={{filter:'drop-shadow(0 0 16px rgba(0,229,180,.6))'}}>
+      <line x1="34" y1="14" x2="34" y2="90" stroke="#E6F0F5" strokeWidth="4" strokeLinecap="round"/>
+      <path d="M34 16 q16 6 32 0 q-6 10 0 20 q-16 6 -32 0 z" fill="#00E5B4">
+        <animate attributeName="d" dur="1.7s" repeatCount="indefinite"
+          values="M34 16 q16 6 32 0 q-6 10 0 20 q-16 6 -32 0 z;M34 16 q16 -3 32 3 q-6 10 0 18 q-16 6 -32 -3 z;M34 16 q16 6 32 0 q-6 10 0 20 q-16 6 -32 0 z"/>
+      </path>
+      <circle cx="34" cy="90" r="5" fill="#00E5B4"/>
+    </svg>
+  );
+}
+
+function ProgressTab({gameId}){
+  const [rows,setRows]=useState(sb?null:[]);
+  const [err,setErr]=useState('');
+  const [busy,setBusy]=useState(false);
+  async function load(){
+    if(!sb) return;
+    setBusy(true);
+    const res=await sb.from('flag_captures').select('*').eq('game_id',gameId).order('created_at',{ascending:false});
+    setBusy(false);
+    if(res.error){ setErr(res.error.message); setRows([]); }
+    else { setErr(''); setRows(res.data||[]); }
+  }
+  useEffect(()=>{
+    load();
+    if(!sb) return;
+    const ch=sb.channel('fc-'+gameId)
+      .on('postgres_changes',{event:'*',schema:'public',table:'flag_captures',filter:'game_id=eq.'+gameId}, load)
+      .subscribe();
+    return ()=>{ try{ sb.removeChannel(ch); }catch(e){} };
+  },[gameId]);
+
+  if(!sb){
+    return (
+      <div className="panel">
+        <h3>Live progress</h3>
+        <p className="help">Connect Supabase — paste your project URL and anon key at the top of the file and run the setup SQL — and every team's captured flags and photos will stream in here in real time.</p>
+      </div>
+    );
+  }
+  const byTeam={};
+  (rows||[]).forEach(r=>{
+    const k=r.team_id||r.team_name;
+    if(!byTeam[k]) byTeam[k]={name:r.team_name||'Team', color:r.team_color||'#00E5B4', items:[]};
+    byTeam[k].items.push(r);
+  });
+  const groups=Object.values(byTeam).sort((a,b)=>b.items.length-a.items.length);
+
+  return (
+    <React.Fragment>
+      <div className="section-label" style={{display:'flex',justifyContent:'space-between'}}>
+        <span>// live from the field · {gameId}</span>
+        <span onClick={load} style={{cursor:'pointer',color:'var(--teal)'}}>{busy?'…':'refresh'}</span>
+      </div>
+      {err && <div className="claim-err" style={{marginBottom:'10px',textAlign:'left'}}>{err}</div>}
+      {rows===null && <div className="empty">Loading…</div>}
+      {rows && rows.length===0 && <div className="empty">No flags claimed yet.<br/>They appear the moment a team uploads a photo.</div>}
+      {groups.map((g,i)=>(
+        <div key={i} className="rank" style={{display:'block'}}>
+          <div style={{display:'flex',alignItems:'center',gap:'10px',marginBottom:'10px'}}>
+            <div className="swatch" style={{background:g.color+'22',border:'1.5px solid '+g.color}}><span style={{fontSize:'13px'}}>&#9873;</span></div>
+            <div style={{flex:1,minWidth:0}}>
+              <div className="nm">{g.name}</div>
+              <div className="flags">{g.items.length} flag{g.items.length===1?'':'s'} · {g.items.reduce((sum,r)=>sum+(r.points||0),0)} pts</div>
+            </div>
+          </div>
+          <div className="thumbs">
+            {g.items.map(r=>(
+              <a key={r.id} href={r.photo_url||'#'} target="_blank" rel="noreferrer" className="thumb" title={r.mission_title}>
+                {r.photo_url ? <img src={r.photo_url} alt={r.mission_title}/> : <span className="noimg">{r.mission_title}</span>}
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </React.Fragment>
+  );
+}
+
+function HuntView({mission, guide, teams, gameId, onClaim, onClose}){
   const [heading,setHeading]=useState(null);
   const [pos,setPos]=useState(null);
   const [acc,setAcc]=useState(null);
@@ -435,6 +537,53 @@ function HuntView({mission, guide, onClose}){
     : dist>40 ? 'Good pace! Keep following the arrow.'
     : 'Getting warm — start scanning around.';
 
+  const [selTeam,setSelTeam]=useState(null);
+  const [shotUrl,setShotUrl]=useState(null);
+  const [phase,setPhase]=useState('aim');
+  const [errMsg,setErrMsg]=useState('');
+  const shotBlobRef=useRef(null);
+  const canvasRef=useRef(null);
+  const fileRef=useRef(null);
+
+  function snap(){
+    const v=videoRef.current;
+    if(v && v.videoWidth){
+      const c=canvasRef.current;
+      c.width=v.videoWidth; c.height=v.videoHeight;
+      c.getContext('2d').drawImage(v,0,0,c.width,c.height);
+      c.toBlob(b=>{ if(!b) return; shotBlobRef.current=b; setShotUrl(URL.createObjectURL(b)); setPhase('preview'); },'image/jpeg',0.85);
+    } else if(fileRef.current){ fileRef.current.click(); }
+  }
+  function onFile(e){
+    const fl=e.target.files && e.target.files[0];
+    if(fl){ shotBlobRef.current=fl; setShotUrl(URL.createObjectURL(fl)); setPhase('preview'); }
+  }
+  async function upload(){
+    if(!selTeam){ setErrMsg('Tap which team is claiming first.'); return; }
+    const team=teams.find(t=>t.id===selTeam) || {name:'Team', color:'#00E5B4'};
+    setErrMsg(''); setPhase('uploading');
+    try{
+      let photoUrl=null;
+      if(sb && shotBlobRef.current){
+        const path=gameId+'/'+selTeam+'/'+mission.id+'-'+Date.now()+'.jpg';
+        const up=await sb.storage.from(PHOTO_BUCKET).upload(path, shotBlobRef.current, {contentType:'image/jpeg', upsert:true});
+        if(up.error) throw up.error;
+        photoUrl=sb.storage.from(PHOTO_BUCKET).getPublicUrl(path).data.publicUrl;
+        const ins=await sb.from('flag_captures').upsert({
+          game_id:gameId, team_id:selTeam, team_name:team.name, team_color:team.color,
+          mission_id:mission.id, mission_title:mission.title, points:mission.pts, photo_url:photoUrl
+        }, {onConflict:'game_id,team_id,mission_id'});
+        if(ins.error) throw ins.error;
+      }
+      onClaim(mission.id, selTeam, photoUrl);
+      setPhase('done');
+      setTimeout(onClose, 1300);
+    }catch(err){
+      setErrMsg((err && err.message) || 'Upload failed — check the connection and try again.');
+      setPhase('preview');
+    }
+  }
+
   let status=null, warn=false;
   if(geo==='denied'){ status='Turn on location to get the arrow and distance.'; warn=true; }
   else if(pos && heading==null){ status='Move the phone in a slow figure-8 to wake the compass.'; }
@@ -457,7 +606,7 @@ function HuntView({mission, guide, onClose}){
 
       <div className="hunt-mid">
         {arrived
-          ? <Reticle/>
+          ? <FlagMark/>
           : rot!=null
             ? <div className="arrow-wrap" style={{transform:'rotate('+rot+'deg)'}}><Arrow/></div>
             : brg!=null
@@ -483,8 +632,43 @@ function HuntView({mission, guide, onClose}){
           <div className="hl">{arrived ? '// you should see' : '// looking for'}</div>
           <div className="hx">{mission.hint}</div>
         </div>
-        <button className="found-btn" onClick={onClose}>Found it — back to flags</button>
+        {arrived ? (
+          <div className="claim">
+            {phase==='done' ? (
+              <div className="claim-done">Flag claimed — nice one!</div>
+            ) : (
+              <React.Fragment>
+                <div className="claim-label">Tap your team, then snap the challenge photo{sb?'':' (offline — saves on this phone only)'}</div>
+                <div className="claim-teams">
+                  {teams.map(t=>(
+                    <button key={t.id} className={'cap-chip '+(selTeam===t.id?'got':'')}
+                      onClick={()=>setSelTeam(t.id)} style={selTeam===t.id?{background:t.color,borderColor:t.color}:{}}>
+                      <span className="tick">{selTeam===t.id?'✓':''}</span>{t.name}
+                    </button>
+                  ))}
+                </div>
+                {shotUrl && <img className="shot" src={shotUrl} alt="challenge"/>}
+                {errMsg && <div className="claim-err">{errMsg}</div>}
+                {phase==='preview' ? (
+                  <div className="claim-actions">
+                    <button className="btn ghost" onClick={()=>{setShotUrl(null); setPhase('aim');}}>Retake</button>
+                    <button className="found-btn" style={{flex:1}} onClick={upload}>{sb?'Upload & claim flag':'Claim flag'}</button>
+                  </div>
+                ) : phase==='uploading' ? (
+                  <button className="found-btn" disabled>Uploading…</button>
+                ) : (
+                  <button className="found-btn" onClick={snap}>Take the challenge photo</button>
+                )}
+              </React.Fragment>
+            )}
+            <button className="hunt-textbtn" onClick={onClose}>Close</button>
+          </div>
+        ) : (
+          <button className="found-btn" onClick={onClose}>Not there yet — back to flags</button>
+        )}
       </div>
+      <canvas ref={canvasRef} style={{display:'none'}}></canvas>
+      <input ref={fileRef} type="file" accept="image/*" capture="environment" style={{display:'none'}} onChange={onFile} />
     </div>
   );
 }
@@ -501,6 +685,7 @@ function App(){
   const [guide, setGuide] = useState('bly');
   const [guideOn, setGuideOn] = useState(true);
   const [line, setLine] = useState(null);
+  const [gameId, setGameId] = useState('test');
 
   const [durMin, setDurMin] = useState(90);
   const [remaining, setRemaining] = useState(90*60);
@@ -514,6 +699,7 @@ function App(){
       setDurMin(g.durMin||90); setRemaining(g.remaining??((g.durMin||90)*60)); setRunning(!!g.running);
       if(g.guide) setGuide(g.guide);
       if(g.guideOn===false) setGuideOn(false);
+      if(g.gameId) setGameId(g.gameId);
     } else {
       setTeams([
         {id:'t1', name:'Team Teal', members:'', color:'#00E5B4'},
@@ -525,8 +711,8 @@ function App(){
   })(); },[]);
 
   useEffect(()=>{ if(!loaded) return;
-    store.set('flagrun_v1', {teams, captures, durMin, remaining, running, guide, guideOn});
-  },[teams, captures, durMin, remaining, running, guide, guideOn, loaded]);
+    store.set('flagrun_v1', {teams, captures, durMin, remaining, running, guide, guideOn, gameId});
+  },[teams, captures, durMin, remaining, running, guide, guideOn, gameId, loaded]);
 
   useEffect(()=>{
     if(running){
@@ -554,6 +740,15 @@ function App(){
       if(c.includes(tid)) next = c.filter(x=>x!==tid);
       else if(m.contested) next = [tid];
       else next = [...c, tid];
+      return {...prev, [mid]: next};
+    });
+  }
+  function claimFlag(mid, tid){
+    setLine(rand(LINES.capture));
+    setCaptures(prev=>{
+      const c = prev[mid] || [];
+      const m = MISSIONS.find(x=>x.id===mid);
+      const next = c.includes(tid) ? c : (m.contested ? [tid] : [...c, tid]);
       return {...prev, [mid]: next};
     });
   }
@@ -598,9 +793,9 @@ function App(){
       </header>
 
       <div className="tabs">
-        {['missions','scores','setup'].map(t=>(
+        {['missions','scores','progress','setup'].map(t=>(
           <button key={t} className={'tab '+(tab===t?'on':'')} onClick={()=>setTab(t)}>
-            {t==='missions'?'Flags':t==='scores'?'Scores':'Setup'}
+            {t==='missions'?'Flags':t==='scores'?'Scores':t==='progress'?'Live':'Setup'}
           </button>
         ))}
       </div>
@@ -682,6 +877,8 @@ function App(){
           </React.Fragment>
         )}
 
+        {tab==='progress' && <ProgressTab gameId={gameId} />}
+
         {tab==='setup' && (
           <React.Fragment>
             <div className="panel">
@@ -696,6 +893,15 @@ function App(){
                 <button className="btn ghost" onClick={resetTimer}>Reset</button>
               </div>
               <div className="section-label" style={{margin:'2px'}}>minutes</div>
+            </div>
+
+            <div className="panel">
+              <h3>Session</h3>
+              <p className="help">A label that keeps each outing's photos and progress separate. The Live tab and every uploaded photo are tagged with this. Change it per outing (e.g. yeronga-test, southbank-0709).</p>
+              <input value={gameId}
+                onChange={e=>setGameId(e.target.value.replace(/[^a-zA-Z0-9-]/g,'').toLowerCase())}
+                placeholder="session code"
+                style={{background:'var(--navy-900)',border:'1px solid var(--line)',borderRadius:'9px',padding:'10px 12px',fontSize:'14px',color:'var(--text)',width:'100%',fontFamily:"'JetBrains Mono',monospace"}} />
             </div>
 
             <div className="panel">
@@ -780,7 +986,7 @@ function App(){
         </div>
       )}
 
-      {hunt && <HuntView mission={hunt} guide={guide} onClose={()=>setHunt(null)} />}
+      {hunt && <HuntView mission={hunt} guide={guide} teams={teams} gameId={gameId} onClaim={claimFlag} onClose={()=>setHunt(null)} />}
     </React.Fragment>
   );
 }
