@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1320" />
+<title>Flag Run — Yeronga (Test)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+<style>
+  :root{
+    --navy-900:#0b1320; --navy-800:#0f1a2b; --navy-700:#16233a; --navy-600:#1b2c46;
+    --line:#20304c; --teal:#00E5B4; --teal-dim:rgba(0,229,180,.14);
+    --gold:#FFC24B; --coral:#FF6B6B; --violet:#A78BFA; --sky:#38BDF8; --lime:#A3E635;
+    --text:#E6F0F5; --muted:#7C90A8;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; background:var(--navy-900); color:var(--text);
+    font-family:'Space Grotesk',system-ui,sans-serif;}
+  body{min-height:100vh; overscroll-behavior-y:none;}
+  #root{max-width:520px; margin:0 auto; min-height:100vh; display:flex; flex-direction:column;}
+  .mono{font-family:'JetBrains Mono',monospace;}
+  button{font-family:inherit; cursor:pointer; border:none; background:none; color:inherit;}
+  input{font-family:inherit;}
+
+  .hud{position:sticky; top:0; z-index:20; background:linear-gradient(180deg,#0c1626,rgba(11,19,32,.92));
+    border-bottom:1px solid var(--line); backdrop-filter:blur(8px); padding:14px 16px 12px;}
+  .hud-top{display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .brand{display:flex; align-items:center; gap:9px;}
+  .brand .dot{width:9px; height:9px; border-radius:2px; background:var(--teal);
+    box-shadow:0 0 10px var(--teal); animation:pulse 2.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.4;}}
+  .brand h1{margin:0; font-size:15px; font-weight:700; letter-spacing:.14em; text-transform:uppercase;}
+  .brand .sub{font-size:9.5px; letter-spacing:.34em; color:var(--muted); text-transform:uppercase;}
+  .clock{display:flex; flex-direction:column; align-items:flex-end;}
+  .clock .t{font-size:26px; font-weight:700; line-height:1; letter-spacing:.02em;}
+  .clock .t.warn{color:var(--gold);} .clock .t.crit{color:var(--coral);}
+  .clock .l{font-size:8.5px; letter-spacing:.28em; color:var(--muted); text-transform:uppercase; margin-top:3px;}
+  .hud-stats{display:flex; gap:8px; margin-top:12px;}
+  .stat{flex:1; background:var(--navy-800); border:1px solid var(--line); border-radius:10px; padding:8px 10px;}
+  .stat .n{font-size:18px; font-weight:700; line-height:1;}
+  .stat .k{font-size:8.5px; letter-spacing:.22em; color:var(--muted); text-transform:uppercase; margin-top:5px;}
+
+  .tabs{display:flex; gap:6px; padding:10px 12px 0;}
+  .tab{flex:1; padding:9px 6px; font-size:11px; font-weight:600; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--muted); border-radius:9px 9px 0 0; text-align:center;
+    border:1px solid transparent; border-bottom:none; transition:.15s;}
+  .tab.on{color:var(--navy-900); background:var(--teal);}
+  .tab:not(.on):active{background:var(--navy-800);}
+
+  main{flex:1; padding:14px 12px 96px;}
+  .section-label{font-size:9.5px; letter-spacing:.28em; text-transform:uppercase; color:var(--muted);
+    margin:2px 2px 10px; font-family:'JetBrains Mono',monospace;}
+
+  .m{background:var(--navy-800); border:1px solid var(--line); border-radius:14px; padding:13px 14px 12px;
+    margin-bottom:11px; position:relative; overflow:hidden;}
+  .m.contested{border-color:rgba(255,107,107,.4);}
+  .m::before{content:''; position:absolute; left:0; top:0; bottom:0; width:3px; background:var(--teal);}
+  .m.contested::before{background:var(--coral);}
+  .m-head{display:flex; justify-content:space-between; align-items:flex-start; gap:10px;}
+  .m-cat{font-size:8.5px; letter-spacing:.24em; text-transform:uppercase; color:var(--teal);
+    font-family:'JetBrains Mono',monospace;}
+  .m.contested .m-cat{color:var(--coral);}
+  .m-title{font-size:15.5px; font-weight:600; margin:5px 0 4px; line-height:1.25;}
+  .m-desc{font-size:12.5px; color:#B9C7D6; line-height:1.45;}
+  .m-pts{flex-shrink:0; text-align:right;}
+  .m-pts .v{font-size:20px; font-weight:700; color:var(--gold); line-height:1; font-family:'JetBrains Mono',monospace;}
+  .m-pts .u{font-size:8px; letter-spacing:.2em; color:var(--muted); text-transform:uppercase;}
+  .tagpill{display:inline-block; font-size:8.5px; letter-spacing:.12em; text-transform:uppercase;
+    padding:2px 7px; border-radius:20px; border:1px solid var(--line); color:var(--muted);
+    margin-top:9px; margin-right:6px; font-family:'JetBrains Mono',monospace;}
+  .guide-btn{display:inline-flex; align-items:center; gap:6px; margin-top:11px; padding:8px 13px;
+    border-radius:9px; background:var(--teal-dim); border:1px solid var(--teal); color:var(--teal);
+    font-size:11.5px; font-weight:600; letter-spacing:.05em;}
+  .guide-btn:active{transform:scale(.97);}
+  .anywhere{margin-top:11px; font-size:10px; color:var(--muted); font-family:'JetBrains Mono',monospace; letter-spacing:.1em;}
+
+  .cap-row{display:flex; flex-wrap:wrap; gap:6px; margin-top:11px; padding-top:11px; border-top:1px dashed var(--line);}
+  .cap-chip{display:flex; align-items:center; gap:5px; padding:6px 10px; border-radius:20px;
+    font-size:11.5px; font-weight:600; border:1.5px solid var(--line); color:var(--muted); transition:.12s;}
+  .cap-chip .tick{width:13px; height:13px; border-radius:50%; border:1.5px solid currentColor;
+    display:flex; align-items:center; justify-content:center; font-size:9px;}
+  .cap-chip.got{color:var(--navy-900);}
+  .cap-chip.got .tick{border-color:rgba(11,19,32,.5);}
+  .cap-empty{font-size:11px; color:var(--muted); padding:6px 2px;}
+
+  .rank{display:flex; align-items:center; gap:12px; background:var(--navy-800); border:1px solid var(--line);
+    border-radius:14px; padding:13px 15px; margin-bottom:10px; transition:.25s;}
+  .rank.lead{border-color:var(--gold); box-shadow:0 0 0 1px rgba(255,194,75,.25), 0 8px 24px rgba(255,194,75,.08);}
+  .rank .pos{font-size:15px; font-weight:700; width:26px; text-align:center; color:var(--muted); font-family:'JetBrains Mono',monospace;}
+  .rank.lead .pos{color:var(--gold);}
+  .rank .swatch{width:34px; height:34px; border-radius:9px; flex-shrink:0; display:flex; align-items:center;
+    justify-content:center; font-size:15px;}
+  .rank .info{flex:1; min-width:0;}
+  .rank .nm{font-size:15px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+  .rank .mem{font-size:10.5px; color:var(--muted); overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:1px;}
+  .rank .flags{font-size:9px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:3px;}
+  .rank .score{text-align:right; flex-shrink:0;}
+  .rank .score .v{font-size:24px; font-weight:700; line-height:1; font-family:'JetBrains Mono',monospace;}
+  .rank .score .u{font-size:8px; letter-spacing:.2em; color:var(--muted); text-transform:uppercase;}
+
+  .panel{background:var(--navy-800); border:1px solid var(--line); border-radius:14px; padding:15px; margin-bottom:14px;}
+  .panel h3{margin:0 0 4px; font-size:13px; font-weight:700; letter-spacing:.06em;}
+  .panel p.help{margin:0 0 13px; font-size:12px; color:var(--muted); line-height:1.5;}
+  .timer-ctl{display:flex; gap:8px; margin-bottom:12px;}
+  .timer-ctl input{width:74px; background:var(--navy-900); border:1px solid var(--line); color:var(--text);
+    border-radius:9px; padding:9px 11px; font-size:15px; text-align:center; font-family:'JetBrains Mono',monospace;}
+  .btn{padding:10px 15px; border-radius:9px; font-size:12px; font-weight:600; letter-spacing:.06em; transition:.12s;}
+  .btn.primary{background:var(--teal); color:var(--navy-900);}
+  .btn.ghost{background:var(--navy-700); color:var(--text); border:1px solid var(--line);}
+  .btn.danger{background:transparent; color:var(--coral); border:1px solid rgba(255,107,107,.4);}
+  .btn:active{transform:scale(.97);}
+  .btn.wide{width:100%; margin-top:4px;}
+
+  .team-row{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line);}
+  .team-row:last-child{border-bottom:none;}
+  .team-row .sw{width:26px; height:26px; border-radius:7px; flex-shrink:0;}
+  .team-row .tin{flex:1; background:transparent; border:none; color:var(--text); font-size:14px; font-weight:600; padding:2px 0;}
+  .team-row .tin:focus{outline:none;}
+  .team-row .min{flex:1; background:transparent; border:none; color:var(--muted); font-size:12px; padding:2px 0;}
+  .team-row .min:focus{outline:none; color:var(--text);}
+  .team-row .rm{color:var(--muted); font-size:18px; padding:0 4px; line-height:1;}
+  .colorpick{display:flex; gap:7px; margin:12px 0 4px; flex-wrap:wrap;}
+  .colorpick .c{width:30px; height:30px; border-radius:8px; border:2px solid transparent;}
+  .colorpick .c.sel{border-color:var(--text);}
+  .addteam{display:flex; gap:8px; margin-top:12px;}
+  .addteam input{flex:1; background:var(--navy-900); border:1px solid var(--line); color:var(--text);
+    border-radius:9px; padding:10px 12px; font-size:14px;}
+  .addteam input:focus{outline:none; border-color:var(--teal);}
+
+  .rulelist{margin:0; padding-left:0; list-style:none;}
+  .rulelist li{position:relative; padding:0 0 11px 26px; font-size:12.5px; line-height:1.5; color:#C4D2E0;}
+  .rulelist li:last-child{padding-bottom:0;}
+  .rulelist li::before{content:attr(data-n); position:absolute; left:0; top:0; font-family:'JetBrains Mono',monospace;
+    font-size:10px; font-weight:700; color:var(--teal); background:var(--teal-dim); width:19px; height:19px;
+    border-radius:6px; display:flex; align-items:center; justify-content:center;}
+  .safety{background:rgba(255,107,107,.07); border:1px solid rgba(255,107,107,.25); border-radius:12px;
+    padding:12px 14px; margin-top:4px;}
+  .safety .st{font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--coral);
+    font-family:'JetBrains Mono',monospace; margin-bottom:6px;}
+  .safety p{margin:0; font-size:12px; color:#D6C0C0; line-height:1.5;}
+
+  .empty{text-align:center; color:var(--muted); font-size:13px; padding:36px 20px; line-height:1.6;}
+  .filterbar{display:flex; gap:6px; margin-bottom:13px; overflow-x:auto; padding-bottom:2px;}
+  .filterbar::-webkit-scrollbar{display:none;}
+  .fchip{flex-shrink:0; padding:6px 13px; border-radius:20px; font-size:10.5px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; border:1px solid var(--line); color:var(--muted);
+    font-family:'JetBrains Mono',monospace;}
+  .fchip.on{background:var(--teal); color:var(--navy-900); border-color:var(--teal);}
+
+  /* ---- hunt / AR overlay ---- */
+  .hunt{position:fixed; inset:0; z-index:100; background:var(--navy-900); overflow:hidden;}
+  .hunt video{position:absolute; inset:0; width:100%; height:100%; object-fit:cover;}
+  .hunt .nofeed{position:absolute; inset:0; background:radial-gradient(circle at 50% 38%, #16233a, #0b1320 72%);}
+  .hunt .scrim{position:absolute; inset:0; background:linear-gradient(180deg, rgba(11,19,32,.6) 0%, rgba(11,19,32,.12) 26%, rgba(11,19,32,.18) 58%, rgba(11,19,32,.92) 100%);}
+  .hunt-top{position:absolute; top:0; left:0; right:0; padding:16px; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; z-index:4;}
+  .ht-cat{font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.24em; text-transform:uppercase; color:var(--teal);}
+  .ht-title{font-size:19px; font-weight:700; margin-top:3px; text-shadow:0 2px 12px rgba(0,0,0,.7);}
+  .hunt-x{width:40px; height:40px; border-radius:50%; background:rgba(11,19,32,.6); border:1px solid var(--line);
+    font-size:19px; flex-shrink:0; color:#fff; display:flex; align-items:center; justify-content:center;}
+  .acc-badge{position:absolute; top:74px; right:16px; font-family:'JetBrains Mono',monospace; font-size:9px;
+    color:var(--muted); background:rgba(11,19,32,.55); padding:4px 8px; border-radius:8px; z-index:4;}
+  .hunt-mid{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:3;}
+  .arrow-wrap{width:170px; height:170px; display:flex; align-items:center; justify-content:center;
+    transition:transform .16s ease-out; filter:drop-shadow(0 0 14px rgba(0,229,180,.55));}
+  .dist{margin-top:16px; text-align:center;}
+  .dist .dv{font-family:'JetBrains Mono',monospace; font-size:46px; font-weight:700; line-height:1; text-shadow:0 2px 18px rgba(0,0,0,.75);}
+  .dist .dv.here{color:var(--teal);}
+  .dist .dl{font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:#C4D2E0; margin-top:7px; font-family:'JetBrains Mono',monospace;}
+  .compass-chip{display:inline-flex; align-items:center; gap:8px; background:rgba(0,229,180,.16); border:1px solid var(--teal);
+    color:var(--teal); border-radius:24px; padding:9px 17px; font-family:'JetBrains Mono',monospace; font-size:14px; letter-spacing:.08em; margin-top:14px;}
+  .hunt-bottom{position:absolute; left:0; right:0; bottom:0; padding:14px 16px 22px; z-index:4;}
+  .status-line{font-size:11px; color:var(--muted); text-align:center; margin-bottom:11px; line-height:1.45; padding:0 8px;}
+  .status-line.warn{color:var(--gold);}
+  .hint-card{background:rgba(15,26,43,.85); border:1px solid var(--line); border-radius:16px; padding:14px 16px; backdrop-filter:blur(6px);}
+  .hint-card.here{border-color:var(--teal); box-shadow:0 0 0 1px rgba(0,229,180,.35);}
+  .hint-card .hl{font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-bottom:6px;}
+  .hint-card .hx{font-size:14px; line-height:1.5; color:#E6F0F5;}
+  .found-btn{width:100%; margin-top:12px; padding:14px; border-radius:12px; background:var(--teal); color:var(--navy-900); font-weight:700; font-size:14px; letter-spacing:.05em;}
+  .found-btn:active{transform:scale(.98);}
+  /* ---- mascot / guide ---- */
+  .mascot-dock{position:fixed; left:0; right:0; bottom:14px; z-index:40; pointer-events:none; display:flex; justify-content:center; padding:0 12px;}
+  .mascot-dock .inner{max-width:520px; width:100%; display:flex; align-items:flex-end; gap:9px;}
+  .mascot{width:64px; height:64px; flex-shrink:0; pointer-events:auto; filter:drop-shadow(0 6px 14px rgba(0,0,0,.45)); animation:bob 3.2s ease-in-out infinite; cursor:pointer;}
+  @keyframes bob{0%,100%{transform:translateY(0);} 50%{transform:translateY(-6px);}}
+  .bubble{pointer-events:auto; background:var(--navy-700); border:1px solid var(--teal); color:var(--text);
+    border-radius:14px 14px 14px 4px; padding:10px 13px; font-size:12.5px; line-height:1.42; flex:1;
+    box-shadow:0 8px 24px rgba(0,0,0,.4); cursor:pointer; animation:pop .25s ease-out;}
+  @keyframes pop{from{transform:scale(.94); opacity:0;} to{transform:scale(1); opacity:1;}}
+  .bubble .who{font-family:'JetBrains Mono',monospace; font-size:8.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin-bottom:3px;}
+  .bubble .tapnote{font-size:9px; color:var(--muted); margin-top:5px; font-family:'JetBrains Mono',monospace;}
+  .coach{display:flex; align-items:center; gap:10px; margin-bottom:10px; padding-bottom:10px; border-bottom:1px solid var(--line);}
+  .coach .cm{width:44px; height:44px; flex-shrink:0;}
+  .coach .cw{font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:.2em; text-transform:uppercase; color:var(--teal); margin-bottom:2px;}
+  .coach .cl{font-size:13px; line-height:1.35; color:var(--text);}
+  @media (prefers-reduced-motion: reduce){ .arrow-wrap{transition:none;} .brand .dot{animation:none;} .mascot{animation:none;} .bubble{animation:none;} }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+const store = {
+  async get(k){
+    try{ if(window.storage){ const r = await window.storage.get(k); return r ? JSON.parse(r.value) : null; } }catch(e){}
+    try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; }catch(e){ return null; }
+  },
+  async set(k,val){
+    const s = JSON.stringify(val);
+    try{ if(window.storage){ await window.storage.set(k, s); return; } }catch(e){}
+    try{ localStorage.setItem(k, s); }catch(e){}
+  }
+};
+
+const TEAM_COLORS = [
+  {name:'Teal',   hex:'#00E5B4'}, {name:'Coral',  hex:'#FF6B6B'},
+  {name:'Gold',   hex:'#FFC24B'}, {name:'Violet', hex:'#A78BFA'},
+  {name:'Sky',    hex:'#38BDF8'}, {name:'Lime',   hex:'#A3E635'},
+];
+
+const MISSIONS = [
+  {id:'m1', cat:'Explore', title:'Yeronga Station', pts:10,
+   coords:{lat:-27.5180055, lng:153.0167946},
+   desc:'Head to the train station. Photo on the platform or the overpass.',
+   hint:'The station platforms and the pedestrian bridge that crosses over the train tracks.'},
+  {id:'m2', cat:'Explore', title:'The bagel cafe', pts:10,
+   coords:{lat:-27.5186702, lng:153.0156762},
+   desc:'Find Side Street Cafe on Shottery St. Photo out the front.',
+   hint:'A little corner cafe on Shottery Street — the one known for its bagels.'},
+  {id:'m3', cat:'Explore', title:'Fairfield Rd shops', pts:10,
+   coords:{lat:-27.5174564, lng:153.0164594},
+   desc:'Get to the shops and coffee spots along Fairfield Road.',
+   hint:'The strip of little shops and cafes on Fairfield Road near the station.'},
+  {id:'m4', cat:'Explore', title:'Yeronga State School', pts:10,
+   coords:{lat:-27.5204412, lng:153.019721},
+   desc:'Find the primary school on Park Road. Photo of the front gate.',
+   hint:'The primary school gates on Park Road.'},
+  {id:'m5', cat:'Explore', title:'Memorial Park', pts:15,
+   coords:{lat:-27.5198172, lng:153.0243239},
+   desc:'Walk to Yeronga Memorial Park — the long-range test (~1 km).',
+   hint:'The big park with the pool, the dog park, and rows of memorial trees.'},
+  {id:'m6', cat:'Create', title:'Statue freeze', pts:10,
+   desc:'Freeze like a statue on the footpath while someone counts to five.'},
+  {id:'m7', cat:'Bonus', title:'Spot a dog or cat', pts:10,
+   desc:'Photograph a friendly dog or cat you pass on your walk.'},
+];
+
+const CATS = ['All','Explore','Create','Connect','Bonus'];
+
+function fmt(sec){
+  if(sec<0) sec=0;
+  const m = Math.floor(sec/60), s = sec%60;
+  return String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+const toRad = d => d*Math.PI/180;
+const toDeg = r => r*180/Math.PI;
+function distanceM(a,b){
+  const R=6371000;
+  const dLat=toRad(b.lat-a.lat), dLng=toRad(b.lng-a.lng);
+  const s=Math.sin(dLat/2)**2 + Math.cos(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.sin(dLng/2)**2;
+  return 2*R*Math.asin(Math.sqrt(s));
+}
+function bearingDeg(a,b){
+  const y=Math.sin(toRad(b.lng-a.lng))*Math.cos(toRad(b.lat));
+  const x=Math.cos(toRad(a.lat))*Math.sin(toRad(b.lat)) - Math.sin(toRad(a.lat))*Math.cos(toRad(b.lat))*Math.cos(toRad(b.lng-a.lng));
+  return (toDeg(Math.atan2(y,x))+360)%360;
+}
+function compass8(deg){
+  return ['north','north-east','east','south-east','south','south-west','west','north-west'][Math.round(deg/45)%8];
+}
+
+function Arrow(){
+  return (
+    <svg className="arrow-wrap" viewBox="0 0 100 100" width="170" height="170">
+      <path d="M50 6 L82 78 L50 60 L18 78 Z" fill="#00E5B4" stroke="#0b1320" strokeWidth="2" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+function Reticle(){
+  return (
+    <svg width="170" height="170" viewBox="0 0 100 100" style={{filter:'drop-shadow(0 0 16px rgba(0,229,180,.7))'}}>
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#00E5B4" strokeWidth="2" opacity="0.5"/>
+      <circle cx="50" cy="50" r="26" fill="none" stroke="#00E5B4" strokeWidth="2.5"/>
+      <circle cx="50" cy="50" r="4" fill="#00E5B4"/>
+      <line x1="50" y1="4" x2="50" y2="20" stroke="#00E5B4" strokeWidth="2.5"/>
+      <line x1="50" y1="80" x2="50" y2="96" stroke="#00E5B4" strokeWidth="2.5"/>
+      <line x1="4" y1="50" x2="20" y2="50" stroke="#00E5B4" strokeWidth="2.5"/>
+      <line x1="80" y1="50" x2="96" y2="50" stroke="#00E5B4" strokeWidth="2.5"/>
+    </svg>
+  );
+}
+
+const rand = arr => arr[Math.floor(Math.random()*arr.length)];
+
+/* ---- original mascots (drawn here, not derived from any existing character) ---- */
+function BlyBird(){
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <ellipse cx="50" cy="86" rx="17" ry="4" fill="#0b1320" opacity="0.25"/>
+      <path d="M40 82 l-4 7 M46 84 l0 8 M54 84 l0 8 M60 82 l4 7" stroke="#FFC24B" strokeWidth="3.4" strokeLinecap="round" fill="none"/>
+      <path d="M50 18 l-5 -9 M50 17 l0 -11 M50 18 l5 -9" stroke="#00E5B4" strokeWidth="3" strokeLinecap="round"/>
+      <ellipse cx="50" cy="52" rx="31" ry="34" fill="#00E5B4"/>
+      <path d="M22 42 q-11 12 -3 30 q7 -4 9 -18 z" fill="#00C6A0"/>
+      <ellipse cx="50" cy="63" rx="18" ry="20" fill="#D6FBF1"/>
+      <circle cx="42" cy="46" r="8" fill="#fff"/>
+      <circle cx="58" cy="46" r="8" fill="#fff"/>
+      <circle cx="43" cy="47" r="3.6" fill="#0b1320"/>
+      <circle cx="57" cy="47" r="3.6" fill="#0b1320"/>
+      <circle cx="44.4" cy="45.6" r="1.2" fill="#fff"/>
+      <circle cx="58.4" cy="45.6" r="1.2" fill="#fff"/>
+      <path d="M50 53 l-6 6 l12 0 z" fill="#FFC24B"/>
+      <circle cx="33" cy="56" r="4" fill="#FF6B6B" opacity="0.55"/>
+      <circle cx="67" cy="56" r="4" fill="#FF6B6B" opacity="0.55"/>
+    </svg>
+  );
+}
+function PipBot(){
+  return (
+    <svg viewBox="0 0 100 100" width="100%" height="100%">
+      <ellipse cx="50" cy="84" rx="20" ry="5" fill="#00E5B4" opacity="0.22"/>
+      <line x1="50" y1="20" x2="50" y2="8" stroke="#00E5B4" strokeWidth="3" strokeLinecap="round"/>
+      <circle cx="50" cy="6" r="4.5" fill="#00E5B4"/>
+      <circle cx="20" cy="48" r="6" fill="#38BDF8"/>
+      <circle cx="80" cy="48" r="6" fill="#38BDF8"/>
+      <rect x="24" y="20" width="52" height="50" rx="16" fill="#16233a" stroke="#00E5B4" strokeWidth="3"/>
+      <rect x="31" y="30" width="38" height="30" rx="11" fill="#0b1320"/>
+      <circle cx="42" cy="43" r="4.4" fill="#00E5B4"/>
+      <circle cx="58" cy="43" r="4.4" fill="#00E5B4"/>
+      <path d="M42 52 q8 6 16 0" stroke="#00E5B4" strokeWidth="2.6" fill="none" strokeLinecap="round"/>
+    </svg>
+  );
+}
+const GUIDES = {
+  bly: {id:'bly', name:'Bly', blurb:'Explorer bird', color:'#00E5B4', Svg:BlyBird},
+  pip: {id:'pip', name:'Pip', blurb:'Scout droid', color:'#38BDF8', Svg:PipBot},
+};
+function Mascot({id}){ const G=GUIDES[id]||GUIDES.bly; const S=G.Svg; return <S/>; }
+
+const LINES = {
+  welcome:[
+    'G’day crew! Pick any flag, go find it, snap a photo. Easy.',
+    'New team today? Love it. Let’s go bag some flags together.',
+    'Tap a flag that looks fun — there’s no wrong pick.',
+  ],
+  idle:[
+    'You’ve got this.',
+    'Photographer ready? Then go, go, go!',
+    'Not sure where to start? Try an Explore flag.',
+    'Take your time. It’s not a race… okay, a little bit a race.',
+    'Grab the easy flags first, then chase the big points.',
+    'Stuck on where something is? Hit “Guide me there”.',
+    'Teamwork gets the bonus flags. Split the jobs up.',
+  ],
+  capture:[
+    'FLAG DOWN! Nice work, team.',
+    'Boom — points on the board!',
+    'Captured! Who’s next?',
+    'That’s how it’s done. Keep the streak going.',
+  ],
+};
+
+function HuntView({mission, guide, onClose}){
+  const [heading,setHeading]=useState(null);
+  const [pos,setPos]=useState(null);
+  const [acc,setAcc]=useState(null);
+  const [cam,setCam]=useState('idle');
+  const [geo,setGeo]=useState('idle');
+  const videoRef=useRef(null);
+  const streamRef=useRef(null);
+  const watchRef=useRef(null);
+  const handlerRef=useRef(null);
+
+  useEffect(()=>{
+    let mounted=true;
+    (async()=>{
+      try{
+        const s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});
+        if(!mounted){ s.getTracks().forEach(t=>t.stop()); return; }
+        streamRef.current=s;
+        if(videoRef.current){ videoRef.current.srcObject=s; videoRef.current.play().catch(()=>{}); }
+        setCam('on');
+      }catch(e){ if(mounted) setCam('denied'); }
+    })();
+
+    if(navigator.geolocation){
+      watchRef.current=navigator.geolocation.watchPosition(
+        p=>{ if(!mounted) return; setPos({lat:p.coords.latitude,lng:p.coords.longitude}); setAcc(p.coords.accuracy); setGeo('on'); },
+        e=>{ if(!mounted) return; setGeo('denied'); },
+        {enableHighAccuracy:true, maximumAge:1000, timeout:20000}
+      );
+    } else setGeo('denied');
+
+    const handler=(ev)=>{
+      let h=null;
+      if(ev.webkitCompassHeading!=null) h=ev.webkitCompassHeading;
+      else if(ev.alpha!=null) h=(360-ev.alpha)%360;
+      if(h!=null && !isNaN(h)) setHeading(h);
+    };
+    handlerRef.current=handler;
+    function attach(){
+      if('ondeviceorientationabsolute' in window) window.addEventListener('deviceorientationabsolute',handler,true);
+      window.addEventListener('deviceorientation',handler,true);
+    }
+    const DOE=window.DeviceOrientationEvent;
+    if(DOE && typeof DOE.requestPermission==='function'){
+      DOE.requestPermission().then(r=>{ if(r==='granted') attach(); }).catch(()=>{});
+    } else attach();
+
+    return ()=>{
+      mounted=false;
+      if(streamRef.current) streamRef.current.getTracks().forEach(t=>t.stop());
+      if(watchRef.current!=null && navigator.geolocation) navigator.geolocation.clearWatch(watchRef.current);
+      const hh=handlerRef.current;
+      window.removeEventListener('deviceorientationabsolute',hh,true);
+      window.removeEventListener('deviceorientation',hh,true);
+    };
+  },[]);
+
+  const target=mission.coords;
+  const dist = pos&&target ? distanceM(pos,target) : null;
+  const brg  = pos&&target ? bearingDeg(pos,target) : null;
+  const arrived = dist!=null && dist<20;
+  const rot = (brg!=null && heading!=null) ? (brg-heading) : null;
+
+  const distText = dist==null ? '—' : dist>=1000 ? (dist/1000).toFixed(1) : Math.round(dist);
+  const distUnit = dist==null ? 'locating' : dist>=1000 ? 'km to flag' : 'metres to flag';
+  const coach = dist==null ? 'Turn on location and I’ll point the way.'
+    : arrived ? 'We made it! See if you can spot it:'
+    : dist>120 ? 'Long way yet — just follow the arrow.'
+    : dist>40 ? 'Good pace! Keep following the arrow.'
+    : 'Getting warm — start scanning around.';
+
+  let status=null, warn=false;
+  if(geo==='denied'){ status='Turn on location to get the arrow and distance.'; warn=true; }
+  else if(pos && heading==null){ status='Move the phone in a slow figure-8 to wake the compass.'; }
+  else if(cam==='denied'){ status='Camera is off — the arrow still guides you. Allow camera for the live view.'; }
+
+  return (
+    <div className="hunt">
+      <video ref={videoRef} playsInline muted autoPlay style={{display: cam==='on' ? 'block':'none'}}></video>
+      {cam!=='on' && <div className="nofeed"></div>}
+      <div className="scrim"></div>
+
+      <div className="hunt-top">
+        <div style={{minWidth:0}}>
+          <div className="ht-cat">Hunt · {mission.cat}</div>
+          <div className="ht-title">{mission.title}</div>
+        </div>
+        <button className="hunt-x" onClick={onClose}>✕</button>
+      </div>
+      {acc!=null && <div className="acc-badge">±{Math.round(acc)}m gps</div>}
+
+      <div className="hunt-mid">
+        {arrived
+          ? <Reticle/>
+          : rot!=null
+            ? <div className="arrow-wrap" style={{transform:'rotate('+rot+'deg)'}}><Arrow/></div>
+            : brg!=null
+              ? <div className="compass-chip">Head {compass8(brg)}</div>
+              : <div className="compass-chip">Finding your position…</div>
+        }
+        <div className="dist">
+          <div className={'dv '+(arrived?'here':'')}>{arrived ? 'HERE' : distText}</div>
+          <div className="dl">{arrived ? 'you’re in the zone' : distUnit}</div>
+        </div>
+      </div>
+
+      <div className="hunt-bottom">
+        {status && <div className={'status-line '+(warn?'warn':'')}>{status}</div>}
+        <div className={'hint-card '+(arrived?'here':'')}>
+          <div className="coach">
+            <div className="cm"><Mascot id={guide}/></div>
+            <div>
+              <div className="cw">{(GUIDES[guide]||GUIDES.bly).name}</div>
+              <div className="cl">{coach}</div>
+            </div>
+          </div>
+          <div className="hl">{arrived ? '// you should see' : '// looking for'}</div>
+          <div className="hx">{mission.hint}</div>
+        </div>
+        <button className="found-btn" onClick={onClose}>Found it — back to flags</button>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [tab, setTab] = useState('missions');
+  const [teams, setTeams] = useState(null);
+  const [captures, setCaptures] = useState({});
+  const [filter, setFilter] = useState('All');
+  const [newTeam, setNewTeam] = useState('');
+  const [pickColor, setPickColor] = useState('#FFC24B');
+  const [loaded, setLoaded] = useState(false);
+  const [hunt, setHunt] = useState(null);
+  const [guide, setGuide] = useState('bly');
+  const [guideOn, setGuideOn] = useState(true);
+  const [line, setLine] = useState(null);
+
+  const [durMin, setDurMin] = useState(90);
+  const [remaining, setRemaining] = useState(90*60);
+  const [running, setRunning] = useState(false);
+  const tick = useRef(null);
+
+  useEffect(()=>{ (async()=>{
+    const g = await store.get('flagrun_v1');
+    if(g){
+      setTeams(g.teams||[]); setCaptures(g.captures||{});
+      setDurMin(g.durMin||90); setRemaining(g.remaining??((g.durMin||90)*60)); setRunning(!!g.running);
+      if(g.guide) setGuide(g.guide);
+      if(g.guideOn===false) setGuideOn(false);
+    } else {
+      setTeams([
+        {id:'t1', name:'Team Teal', members:'', color:'#00E5B4'},
+        {id:'t2', name:'Team Coral', members:'', color:'#FF6B6B'},
+      ]);
+    }
+    setLine(rand(LINES.welcome));
+    setLoaded(true);
+  })(); },[]);
+
+  useEffect(()=>{ if(!loaded) return;
+    store.set('flagrun_v1', {teams, captures, durMin, remaining, running, guide, guideOn});
+  },[teams, captures, durMin, remaining, running, guide, guideOn, loaded]);
+
+  useEffect(()=>{
+    if(running){
+      tick.current = setInterval(()=> setRemaining(r=>{
+        if(r<=1){ clearInterval(tick.current); setRunning(false); return 0; }
+        return r-1;
+      }), 1000);
+    }
+    return ()=> clearInterval(tick.current);
+  },[running]);
+
+  if(!loaded || !teams) return null;
+
+  const scoreOf = tid => MISSIONS.reduce((sum,m)=> sum + ((captures[m.id]||[]).includes(tid) ? m.pts : 0), 0);
+  const flagsOf = tid => MISSIONS.reduce((n,m)=> n + ((captures[m.id]||[]).includes(tid) ? 1 : 0), 0);
+  const totalFlags = Object.values(captures).reduce((n,arr)=> n + (arr?arr.length:0), 0);
+
+  function toggleCapture(mid, tid){
+    const cur = captures[mid] || [];
+    if(!cur.includes(tid)) setLine(rand(LINES.capture));
+    setCaptures(prev=>{
+      const c = prev[mid] || [];
+      const m = MISSIONS.find(x=>x.id===mid);
+      let next;
+      if(c.includes(tid)) next = c.filter(x=>x!==tid);
+      else if(m.contested) next = [tid];
+      else next = [...c, tid];
+      return {...prev, [mid]: next};
+    });
+  }
+  function addTeam(){
+    const nm = newTeam.trim(); if(!nm) return;
+    setTeams([...teams, {id:'t'+Date.now(), name:nm, members:'', color:pickColor}]);
+    setNewTeam('');
+  }
+  function updTeam(id, patch){ setTeams(teams.map(t=> t.id===id ? {...t,...patch} : t)); }
+  function rmTeam(id){
+    setTeams(teams.filter(t=>t.id!==id));
+    setCaptures(Object.fromEntries(Object.entries(captures).map(([k,v])=>[k, v.filter(x=>x!==id)])));
+  }
+  function resetTimer(){ setRunning(false); setRemaining(durMin*60); }
+  function resetGame(){ if(confirm('Clear all captured flags and scores? Teams stay.')) setCaptures({}); }
+
+  const ranked = [...teams].map(t=>({...t, s:scoreOf(t.id), f:flagsOf(t.id)})).sort((a,b)=> b.s-a.s || b.f-a.f);
+  const shown = filter==='All' ? MISSIONS : MISSIONS.filter(m=>m.cat===filter);
+  const clockClass = remaining<=60 ? 'crit' : remaining<=300 ? 'warn' : '';
+
+  return (
+    <React.Fragment>
+      <header className="hud">
+        <div className="hud-top">
+          <div className="brand">
+            <span className="dot"></span>
+            <div>
+              <h1>Flag Run</h1>
+              <div className="sub">Yeronga Test</div>
+            </div>
+          </div>
+          <div className="clock">
+            <div className={'t mono '+clockClass}>{fmt(remaining)}</div>
+            <div className="l">{running ? 'Running' : remaining===0 ? 'Time up' : 'Paused'}</div>
+          </div>
+        </div>
+        <div className="hud-stats">
+          <div className="stat"><div className="n mono">{teams.length}</div><div className="k">Teams</div></div>
+          <div className="stat"><div className="n mono">{totalFlags}</div><div className="k">Flags Taken</div></div>
+          <div className="stat"><div className="n mono">{MISSIONS.length}</div><div className="k">Flags Total</div></div>
+        </div>
+      </header>
+
+      <div className="tabs">
+        {['missions','scores','setup'].map(t=>(
+          <button key={t} className={'tab '+(tab===t?'on':'')} onClick={()=>setTab(t)}>
+            {t==='missions'?'Flags':t==='scores'?'Scores':'Setup'}
+          </button>
+        ))}
+      </div>
+
+      <main>
+        {tab==='missions' && (
+          <React.Fragment>
+            <div className="filterbar">
+              {CATS.map(c=>(
+                <button key={c} className={'fchip '+(filter===c?'on':'')} onClick={()=>setFilter(c)}>{c}</button>
+              ))}
+            </div>
+            {shown.map(m=>{
+              const got = captures[m.id] || [];
+              return (
+                <div key={m.id} className={'m '+(m.contested?'contested':'')}>
+                  <div className="m-head">
+                    <div style={{minWidth:0}}>
+                      <div className="m-cat">{m.cat}{m.contested?' • contested':''}</div>
+                      <div className="m-title">{m.title}</div>
+                      <div className="m-desc">{m.desc}</div>
+                      <div>
+                        {m.optional && <span className="tagpill">Optional · opt-out ok</span>}
+                      </div>
+                      {m.coords
+                        ? <button className="guide-btn" onClick={()=>setHunt(m)}>▲&nbsp; Guide me there</button>
+                        : <div className="anywhere">// do this anywhere</div>}
+                    </div>
+                    <div className="m-pts">
+                      <div className="v">{m.pts}</div>
+                      <div className="u">pts</div>
+                    </div>
+                  </div>
+                  <div className="cap-row">
+                    {teams.length===0
+                      ? <span className="cap-empty">Add teams in Setup to award flags.</span>
+                      : teams.map(t=>{
+                          const on = got.includes(t.id);
+                          return (
+                            <button key={t.id}
+                              className={'cap-chip '+(on?'got':'')}
+                              onClick={()=>toggleCapture(m.id, t.id)}
+                              style={on?{background:t.color, borderColor:t.color}:{}}>
+                              <span className="tick">{on?'✓':''}</span>
+                              {t.name}
+                            </button>
+                          );
+                        })
+                    }
+                  </div>
+                </div>
+              );
+            })}
+            {guideOn && <div style={{height:'88px'}}></div>}
+          </React.Fragment>
+        )}
+
+        {tab==='scores' && (
+          <React.Fragment>
+            <div className="section-label">// live standings</div>
+            {ranked.length===0 && <div className="empty">No teams yet.<br/>Head to Setup to build your teams.</div>}
+            {ranked.map((t,i)=>(
+              <div key={t.id} className={'rank '+(i===0 && t.s>0 ? 'lead':'')}>
+                <div className="pos mono">{i===0 && t.s>0 ? '★' : '#'+(i+1)}</div>
+                <div className="swatch" style={{background:t.color+'22', border:'1.5px solid '+t.color}}>
+                  <span style={{fontSize:'13px'}}>⚑</span>
+                </div>
+                <div className="info">
+                  <div className="nm">{t.name}</div>
+                  {t.members ? <div className="mem">{t.members}</div> : null}
+                  <div className="flags">{t.f} flag{t.f===1?'':'s'} captured</div>
+                </div>
+                <div className="score">
+                  <div className="v" style={{color:t.color}}>{t.s}</div>
+                  <div className="u">points</div>
+                </div>
+              </div>
+            ))}
+          </React.Fragment>
+        )}
+
+        {tab==='setup' && (
+          <React.Fragment>
+            <div className="panel">
+              <h3>Game clock</h3>
+              <p className="help">Set the window, hit start when you release the teams. It keeps running if the screen sleeps.</p>
+              <div className="timer-ctl">
+                <input type="number" min="5" max="240" value={durMin}
+                  onChange={e=>{const v=Math.max(1,+e.target.value||0); setDurMin(v); if(!running) setRemaining(v*60);}} />
+                <button className="btn primary" style={{flex:1}} onClick={()=>{ if(remaining===0) setRemaining(durMin*60); setRunning(r=>!r); }}>
+                  {running ? 'Pause' : remaining===0 ? 'Restart' : remaining===durMin*60 ? 'Start' : 'Resume'}
+                </button>
+                <button className="btn ghost" onClick={resetTimer}>Reset</button>
+              </div>
+              <div className="section-label" style={{margin:'2px'}}>minutes</div>
+            </div>
+
+            <div className="panel">
+              <h3>Your guide</h3>
+              <p className="help">A friendly character pops up to cheer the teens on and read hints aloud in Hunt mode. Pick who guides your group — or switch them off for a quieter run.</p>
+              <div style={{display:'flex', gap:'10px', marginBottom:'12px'}}>
+                {Object.values(GUIDES).map(g=>(
+                  <button key={g.id} onClick={()=>setGuide(g.id)}
+                    style={{flex:1, background: guide===g.id ? 'var(--teal-dim)':'var(--navy-900)',
+                      border:'1px solid '+(guide===g.id?'var(--teal)':'var(--line)'), borderRadius:'12px', padding:'12px 8px', textAlign:'center'}}>
+                    <div style={{width:'52px', height:'52px', margin:'0 auto 6px'}}><Mascot id={g.id}/></div>
+                    <div style={{fontSize:'13px', fontWeight:600, color:'var(--text)'}}>{g.name}</div>
+                    <div style={{fontSize:'10.5px', color:'var(--muted)', marginTop:'2px'}}>{g.blurb}</div>
+                  </button>
+                ))}
+              </div>
+              <button className="btn ghost wide" onClick={()=>setGuideOn(v=>!v)}>
+                {guideOn ? 'Turn guide off' : 'Turn guide on'}
+              </button>
+            </div>
+
+            <div className="panel">
+              <h3>Teams</h3>
+              <p className="help">Mix each team so a teen is paired with a worker they don’t usually have — that’s the whole point of the swap. Tap a name or the member line to edit.</p>
+              {teams.map(t=>(
+                <div className="team-row" key={t.id}>
+                  <div className="sw" style={{background:t.color}}></div>
+                  <div style={{flex:1, minWidth:0}}>
+                    <input className="tin" value={t.name} onChange={e=>updTeam(t.id,{name:e.target.value})} />
+                    <input className="min" placeholder="+ members (e.g. Max, Rangi)" value={t.members}
+                      onChange={e=>updTeam(t.id,{members:e.target.value})} />
+                  </div>
+                  <button className="rm" onClick={()=>rmTeam(t.id)}>×</button>
+                </div>
+              ))}
+              <div className="colorpick">
+                {TEAM_COLORS.map(c=>(
+                  <button key={c.hex} className={'c '+(pickColor===c.hex?'sel':'')}
+                    style={{background:c.hex}} onClick={()=>setPickColor(c.hex)} />
+                ))}
+              </div>
+              <div className="addteam">
+                <input placeholder="New team name" value={newTeam}
+                  onChange={e=>setNewTeam(e.target.value)}
+                  onKeyDown={e=>{if(e.key==='Enter') addTeam();}} />
+                <button className="btn primary" onClick={addTeam}>Add</button>
+              </div>
+            </div>
+
+            <div className="panel">
+              <h3>How it runs</h3>
+              <ol className="rulelist">
+                <li data-n="1">Every team gets the same flag list. Complete a flag, show your worker the photo, they tap your team on that flag.</li>
+                <li data-n="2">Any team can take any flag — points stack up, nobody’s knocked out. You play the whole time.</li>
+                <li data-n="3">Contested flags (red) go to the first team only. That’s the scramble.</li>
+                <li data-n="4">Tap Guide me there to open the camera and follow the arrow to the next flag.</li>
+                <li data-n="5">Give everyone a job: navigator, photographer, timekeeper, clue-reader. Quiet jobs count.</li>
+                <li data-n="6">Optional flags are opt-out with no penalty. When the clock hits zero, walk back to base camp — highest points wins.</li>
+              </ol>
+            </div>
+
+            <div className="safety">
+              <div className="st">// test run</div>
+              <p>This is a test run near Simon St, Yeronga — no teens needed. When the popup asks, allow location and camera, then walk down the street: watch Bly’s arrow swing around and the distance count down as you move. Tap a flag’s “Guide me there” to start. The park flag is about a kilometre away for a longer test.</p>
+            </div>
+
+            <button className="btn danger wide" onClick={resetGame}>Clear all flags &amp; scores</button>
+          </React.Fragment>
+        )}
+      </main>
+
+      {guideOn && tab==='missions' && !hunt && (
+        <div className="mascot-dock">
+          <div className="inner">
+            <div className="mascot" onClick={()=>setLine(rand(LINES.idle))}><Mascot id={guide}/></div>
+            <div className="bubble" onClick={()=>setLine(rand(LINES.idle))}>
+              <div className="who">{(GUIDES[guide]||GUIDES.bly).name}</div>
+              {line || rand(LINES.idle)}
+              <div className="tapnote">tap me for another tip</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {hunt && <HuntView mission={hunt} guide={guide} onClose={()=>setHunt(null)} />}
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
