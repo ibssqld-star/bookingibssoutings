@@ -228,6 +228,9 @@
   .lab-t{font-weight:700; font-size:15px;}
   .lab-s{font-size:11.5px; color:var(--muted); margin-top:2px; line-height:1.4;}
   .lab-chat{width:100%; max-width:420px;}
+  .chat-chips{display:flex; flex-wrap:wrap; gap:7px; padding:9px 0 2px;}
+  .chip{font-size:11.5px; color:var(--teal); border:1px solid rgba(0,229,180,.4); background:rgba(0,229,180,.06); border-radius:20px; padding:7px 12px; line-height:1.2;}
+  .chip:active{background:rgba(0,229,180,.16);}
 </style>
 </head>
 <body>
@@ -589,16 +592,19 @@ function ChatCoach({teen}){
   const me=P.find(x=>x.sw===teen);
   const person=me?me.name:null;
   const greet=person
-    ? "Hey "+teen+"! You're supporting "+person+" today. Ask me anything about helping "+person+", or run an activity idea past me and I'll tell you if it fits."
-    : "Hey! Ask me about who you're supporting — their goal, what helps, or run an activity idea past me and I'll tell you if it fits.";
+    ? "Hey "+teen+"! You're supporting "+person+" today. Ask me for activity ideas, or anything about helping "+person+" — tap a question below to start!"
+    : "Hey! Ask me for activity ideas, or anything about who you're supporting — tap a question below to start!";
+  const chips = person
+    ? ["What's "+person+"'s goal?", "What activities could I lead?", "How do I support "+person+"?"]
+    : ["What's my person's goal?", "What activities could I lead?", "How do I support them?"];
   const [msgs,setMsgs]=useState([{role:"assistant",content:greet}]);
   const [input,setInput]=useState("");
   const [loading,setLoading]=useState(false);
   const [err,setErr]=useState("");
   const scrollRef=useRef(null);
   useEffect(()=>{ const el=scrollRef.current; if(el) el.scrollTop=el.scrollHeight; },[msgs,loading]);
-  async function send(){
-    const q=input.trim(); if(!q||loading) return;
+  async function send(preset){
+    const q=(typeof preset==="string"?preset:input).trim(); if(!q||loading) return;
     const next=[...msgs,{role:"user",content:q}];
     setMsgs(next); setInput(""); setLoading(true); setErr("");
     let api=next.slice(); while(api.length && api[0].role!=="user") api.shift();
@@ -623,10 +629,13 @@ function ChatCoach({teen}){
         {loading && <div className="bub coach think">Coach is thinking…</div>}
         {err && <div className="chat-err">{err}</div>}
       </div>
+      <div className="chat-chips">
+        {chips.map((c,i)=><button key={i} className="chip" onClick={()=>send(c)} disabled={loading}>{c}</button>)}
+      </div>
       <div className="chat-in">
         <input value={input} placeholder="e.g. Would a loud dance-off suit Harry's goal?"
           onChange={e=>setInput(e.target.value)} onKeyDown={e=>{ if(e.key==="Enter") send(); }} />
-        <button className="chat-send" onClick={send} disabled={loading}>Send</button>
+        <button className="chat-send" onClick={()=>send()} disabled={loading}>Send</button>
       </div>
       <div className="chat-hint">Coach helps you brainstorm — you still design and run it!</div>
     </div>
