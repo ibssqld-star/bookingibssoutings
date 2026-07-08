@@ -449,9 +449,9 @@ const QUIZ = [
     yay:"Lovely — a tiny step, and you're right there with them." },
 ];
 
-function Briefing({onDone}){
+function Briefing({teen, onDone}){
   const lines=[
-    "G'day team! I'm Coach. Welcome to Support Squad.",
+    "Hi "+teen+"! I'm Coach. Welcome to Support Squad.",
     "We're here to work as a team. Your team today: "+listFmt(P.map(p=>p.sw))+".",
     "Today you're each a support worker — supporting: "+listFmt(P.map(p=>p.name))+".",
     "We're here to build their independence by helping them work on their goals.",
@@ -620,15 +620,18 @@ function ChatCoach(){
   );
 }
 
-function Home({onOpenShift}){
+function Home({teen, onOpenShift, onLogout}){
   const [tab,setTab]=useState('day');
   const [card,setCard]=useState(null);
   return (
     <React.Fragment>
       <div className="top">
         <div className="brand"><div className="logo sm"></div>
-          <div><div className="nm">SWAP SQUAD</div><div className="sub">Support View</div></div></div>
-        <button className="btn-sm" onClick={onOpenShift}>Open my shift</button>
+          <div><div className="nm">SWAP SQUAD</div><div className="sub">Hi, {teen}</div></div></div>
+        <div style={{display:"flex",gap:"8px",alignItems:"center"}}>
+          <button className="btn-sm" onClick={onOpenShift}>My shift</button>
+          <button className="btn-sm grey" onClick={onLogout}>Sign out</button>
+        </div>
       </div>
       <main>
         <div className="tabs">
@@ -695,35 +698,28 @@ function Home({onOpenShift}){
   );
 }
 
-function Gate({onUnlock, onBack}){
+function Login({onLogin}){
   const [pin,setPin]=useState('');
   const [err,setErr]=useState(false);
   function submit(){
     const p=P.find(x=>x.code===pin.trim());
-    if(p){ onUnlock(p.sw); } else { setErr(true); setTimeout(()=>setErr(false),400); }
+    if(p){ onLogin(p.sw); } else { setErr(true); setTimeout(()=>setErr(false),400); }
   }
   return (
-    <React.Fragment>
-      <div className="top">
-        <div className="brand"><div className="logo sm"></div>
-          <div><div className="nm">SWAP SQUAD</div><div className="sub">Support View</div></div></div>
-        <button className="btn-sm grey" onClick={onBack}>Back</button>
-      </div>
-      <div className="gate">
-        <div className="logo lg" style={{margin:'0 auto 18px'}}></div>
-        <h2>Open your shift</h2>
-        <p>Enter your personal code. You\u2019ll only see your own shift.</p>
-        <input className={'pin '+(err?'err':'')} inputMode="numeric" maxLength="4" placeholder="\u2022\u2022\u2022\u2022"
-          value={pin} onChange={e=>setPin(e.target.value.replace(/[^0-9]/g,''))}
-          onKeyDown={e=>{if(e.key==='Enter') submit();}} />
-        <div className="errmsg">{err?'That code didn\u2019t match \u2014 try again.':''}</div>
-        <button className="cta" style={{margin:0,width:'100%'}} onClick={submit}>Open shift</button>
-      </div>
-    </React.Fragment>
+    <div className="gate" style={{minHeight:'100vh', display:'flex', flexDirection:'column', justifyContent:'center'}}>
+      <div className="logo lg" style={{margin:'0 auto 18px'}}></div>
+      <h2>Sign in</h2>
+      <p>Enter your personal code to start your shift.</p>
+      <input className={'pin '+(err?'err':'')} inputMode="numeric" maxLength="4" placeholder="\u2022\u2022\u2022\u2022"
+        value={pin} onChange={e=>setPin(e.target.value.replace(/[^0-9]/g,''))}
+        onKeyDown={e=>{if(e.key==='Enter') submit();}} />
+      <div className="errmsg">{err?'That code didn\u2019t match \u2014 try again.':''}</div>
+      <button className="cta" style={{margin:0,width:'100%'}} onClick={submit}>Sign in</button>
+    </div>
   );
 }
 
-function ShiftView({p, onOut}){
+function ShiftView({p, onBack}){
   const [tab,setTab]=useState('shift');
   const [signedOn,setSignedOn]=useState(false);
   const [signAt,setSignAt]=useState('');
@@ -743,7 +739,7 @@ function ShiftView({p, onOut}){
       <div className="top">
         <div className="brand"><div className="logo sm"></div>
           <div><div className="nm">SWAP SQUAD</div><div className="sub">{p.sw}\u2019s shift</div></div></div>
-        <button className="btn-sm grey" onClick={onOut}>Sign out</button>
+        <button className="btn-sm grey" onClick={onBack}>Back</button>
       </div>
       <main>
         <div className="summary">
@@ -797,12 +793,19 @@ function ShiftView({p, onOut}){
 }
 
 function App(){
-  const [view,setView]=useState('briefing');   // briefing | home | gate | shift
+  const [view,setView]=useState('loading');   // loading | login | briefing | home | shift
   const [teen,setTeen]=useState(null);
-  if(view==='briefing'){ return <Briefing onDone={()=>setView('home')}/>; }
-  if(view==='shift' && teen){ const p=P.find(x=>x.sw===teen); return <ShiftView p={p} onOut={()=>{setView('home'); setTeen(null);}}/>; }
-  if(view==='gate'){ return <Gate onBack={()=>setView('home')} onUnlock={(t)=>{setTeen(t); setView('shift');}}/>; }
-  return <Home onOpenShift={()=>setView('gate')}/>;
+  useEffect(()=>{ (async()=>{
+    const t=await store.get('current_teen');
+    if(t && P.find(x=>x.sw===t)){ setTeen(t); setView('home'); } else setView('login');
+  })(); },[]);
+  function login(t){ setTeen(t); store.set('current_teen', t); setView('briefing'); }
+  function logout(){ setTeen(null); store.set('current_teen', null); setView('login'); }
+  if(view==='loading') return null;
+  if(view==='login'){ return <Login onLogin={login}/>; }
+  if(view==='briefing'){ return <Briefing teen={teen} onDone={()=>setView('home')}/>; }
+  if(view==='shift' && teen){ const p=P.find(x=>x.sw===teen); return <ShiftView p={p} onBack={()=>setView('home')}/>; }
+  return <Home teen={teen} onOpenShift={()=>setView('shift')} onLogout={logout}/>;
 }
 
 ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
