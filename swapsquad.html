@@ -231,6 +231,60 @@
   .chat-chips{display:flex; flex-wrap:wrap; gap:7px; padding:9px 0 2px;}
   .chip{font-size:11.5px; color:var(--teal); border:1px solid rgba(0,229,180,.4); background:rgba(0,229,180,.06); border-radius:20px; padding:7px 12px; line-height:1.2;}
   .chip:active{background:rgba(0,229,180,.16);}
+
+  /* ============ COLOURFUL FUTURISTIC — ORANGE SHIMMER ============ */
+  :root{ --orange:#FF7A1A; --pink:#FF4D8D; }
+  @keyframes holo{0%{background-position:0% 50%;}100%{background-position:200% 50%;}}
+  @keyframes sheen{0%{left:-60%;}60%,100%{left:135%;}}
+  @keyframes logopulse{0%,100%{box-shadow:0 0 16px rgba(255,122,26,.5);}50%{box-shadow:0 0 28px rgba(255,122,26,.8), 0 0 12px rgba(0,229,180,.5);}}
+
+  body{
+    background:
+      linear-gradient(rgba(0,229,180,.035) 1px, transparent 1px) 0 0 / 34px 34px,
+      linear-gradient(90deg, rgba(0,229,180,.035) 1px, transparent 1px) 0 0 / 34px 34px,
+      radial-gradient(900px 480px at 14% -6%, rgba(255,122,26,.17), transparent 60%),
+      radial-gradient(820px 520px at 96% 3%, rgba(255,77,141,.13), transparent 58%),
+      radial-gradient(900px 640px at 50% 110%, rgba(0,229,180,.13), transparent 60%),
+      linear-gradient(180deg,#0a0a1a,#0b1320 45%,#0a0f1e);
+    background-attachment:fixed;
+  }
+
+  .logo{ animation:logopulse 3s ease-in-out infinite; }
+
+  /* primary actions: bright orange holographic shimmer */
+  .cta,.signbtn,.chat-send,.brief-next,.printbtn{
+    position:relative; overflow:hidden; border:none; color:#160a04;
+    background:linear-gradient(90deg,#FF7A1A,#FF4D8D,#FFB03C,#FF7A1A);
+    background-size:200% 100%; animation:holo 4s linear infinite;
+    box-shadow:0 0 22px rgba(255,122,26,.5);
+  }
+  .cta::after,.signbtn::after,.chat-send::after,.brief-next::after,.printbtn::after{
+    content:""; position:absolute; top:0; left:-60%; width:45%; height:100%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,.55), transparent);
+    animation:sheen 3.2s ease-in-out infinite;
+  }
+  .signbtn.on{ background:rgba(0,229,180,.12); color:var(--teal); animation:none; box-shadow:none; border:1px solid var(--teal); }
+  .signbtn.on::after{ display:none; }
+
+  /* header + brackets + scan line go warm */
+  .top{ border-bottom-color:rgba(255,122,26,.28); }
+  .top .brand .nm{ text-shadow:0 0 14px rgba(255,122,26,.45); }
+  .top::after{ background:linear-gradient(90deg, transparent, rgba(255,122,26,.85), rgba(0,229,180,.65), transparent); }
+  .summary::before,.summary::after{ border-color:var(--orange); }
+
+  /* tabs */
+  .tab.on{ background:linear-gradient(180deg,#FF7A1A,#FF4D8D); color:#160a04; box-shadow:0 0 18px rgba(255,122,26,.5); }
+  .tab.shimmer{ border-color:rgba(255,122,26,.55); }
+  .tab.shimmer::after{ background:linear-gradient(100deg, transparent, rgba(255,122,26,.55), transparent); }
+
+  /* small accents */
+  .btn-sm{ color:#FF9A3C; border-color:rgba(255,122,26,.5); }
+  .pill.on{ background:var(--orange); border-color:var(--orange); color:#160a04; box-shadow:0 0 14px rgba(255,122,26,.5); }
+  .chip{ color:#FFB877; border-color:rgba(255,122,26,.45); background:rgba(255,122,26,.08); }
+  .chip:active{ background:rgba(255,122,26,.18); }
+  .goalbox{ box-shadow:0 0 22px rgba(255,122,26,.12); }
+  .phero{ border-color:rgba(255,122,26,.28); }
+  .brief-bubble{ box-shadow:0 0 26px rgba(255,122,26,.14); }
 </style>
 </head>
 <body>
