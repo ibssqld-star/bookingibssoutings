@@ -246,25 +246,33 @@ const store = {
 const DAY = [
   {t:'9:30', d:'<b>Meet & brief</b> at Yeronga Memorial Park'},
   {t:'9:51', d:'<b>Bus</b> to Annerley (the transport mission)'},
-  {t:'10:00', d:'<b>Shop</b> at Woolworths Annerley \u2014 burgers + morning tea'},
+  {t:'10:00', d:'<b>Shop</b> at Woolworths Annerley — burgers + morning tea'},
   {t:'10:45', d:'<b>Bus back</b> to the park'},
   {t:'11:05', d:'<b>Morning tea</b> + set up the challenges'},
-  {t:'11:30', d:'<b>Games</b> \u2014 the activities you designed'},
-  {t:'12:20', d:'<b>Cook</b> \u2014 direct your participant to cook the burgers'},
+  {t:'11:30', d:'<b>Games</b> — the activities you designed'},
+  {t:'12:20', d:'<b>Cook</b> — direct your participant to cook the burgers'},
   {t:'1:05', d:'<b>Lunch</b> together'},
-  {t:'1:45', d:'<b>Wind-down</b> \u2014 goal check-in, debrief, awards'},
+  {t:'1:45', d:'<b>Wind-down</b> — goal check-in, debrief, awards'},
   {t:'2:30', d:'<b>Free time & pack up</b>'},
   {t:'3:00', d:'<b>Wrap</b> / pickup'},
 ];
 
 const ACTIVITIES = [
+  {nm:'Basketball Round-the-World', ds:'At the basketball court, take turns shooting from spots around the key so everyone gets a go.', gf:'good for: taking turns, having a go'},
+  {nm:'Rebound Wall Rally', ds:'At the free rebound wall, count how many hits in a row you can get as a team.', gf:'good for: calm focus, clear rules'},
+  {nm:'Oval Relay Race', ds:'On the big grass oval, split into teams and race a short course one at a time.', gf:'good for: waiting your turn'},
+  {nm:'Honour Avenue Scavenger', ds:'Find a list of things down the palm-lined Honour Avenue as one team, no splitting up.', gf:'good for: staying with the group'},
+  {nm:'Backyard Cricket', ds:'On the cricket oval, everyone gets a turn to bat and to bowl.', gf:'good for: taking turns, joining in'},
+  {nm:'Fitness Circuit', ds:'At the outdoor gym station, cheer each other through a fun circuit of reps.', gf:'good for: confidence, big energy'},
+  {nm:'Giant Draughts Duel', ds:'On the heritage in-ground draughts board, play a calm strategy game as a break from the loud ones.', gf:'good for: calm, clear rules, thinking'},
+  {nm:'Playground Warm-Up', ds:'Ease-in games at the playground to help everyone settle before the big challenges.', gf:'good for: warming up gently'},
   {nm:'Tallest Tower', ds:'Build the highest tower from cups or sticks before it topples.', gf:'good for: staying calm when it falls'},
   {nm:'Mystery Taste Test', ds:'Blindfold, taste a snack, and guess what it is.', gf:'good for: brave tries, making choices'},
   {nm:'Dance-Off (with a chill corner)', ds:'Everyone busts a move; a marked quiet spot to step out to.', gf:'good for: big energy + sensory breaks'},
   {nm:'Freeze Frame', ds:'Dance while the music plays, freeze like a statue on "stop".', gf:'good for: listening, impulse control'},
   {nm:'Obstacle Relay', ds:'A short course, one person at a time, against the clock.', gf:'good for: waiting your turn'},
   {nm:'Charades', ds:'Act out a word or animal with no talking.', gf:'good for: clear cues, warming up'},
-  {nm:'Stick-Together Scavenger', ds:'Find a list of things as one team \u2014 no splitting up.', gf:'good for: staying with the group'},
+  {nm:'Stick-Together Scavenger', ds:'Find a list of things as one team — no splitting up.', gf:'good for: staying with the group'},
   {nm:'Simon Says', ds:'Only do it when "Simon says". Listen for the whole instruction.', gf:'good for: listening before acting'},
   {nm:'Add-a-Move Circle', ds:'Everyone adds one move to a growing routine.', gf:'good for: joining in, warming up'},
   {nm:'Blind Drawing', ds:'One person describes a picture, the rest draw it.', gf:'good for: asking "what do you mean?"'},
@@ -273,54 +281,54 @@ const ACTIVITIES = [
   {nm:'Make-the-Rules', ds:'The group invents the rules for a brand-new game together.', gf:'good for: choice + buy-in'},
   {nm:'Human Knot', ds:'Hold hands across the circle, then untangle without letting go.', gf:'good for: teamwork, patience'},
   {nm:'Balloon Keep-Up', ds:'Keep the balloon off the ground as a team.', gf:'good for: energy, teamwork'},
-  {nm:'Would-You-Rather Circle', ds:'Quick fun either/or questions \u2014 everyone gives their answer.', gf:'good for: low-pressure sharing'},
+  {nm:'Would-You-Rather Circle', ds:'Quick fun either/or questions — everyone gives their answer.', gf:'good for: low-pressure sharing'},
 ];
 
 const P = [
   { name:'Oliver', sw:'Mihali', code:'2481', role:'Likes to know the plan', moves:'Reassure him with certainty — "here’s exactly what’s happening next." Praise him for rolling with a change: "great job trying something new, Oliver!" Stay calm and walk him through the steps.', test:'I’ll keep asking "but what’s next?" and plant my feet until I know the whole plan.',
-    goal:'Try one thing that isn\u2019t on the plan \u2014 without it wrecking his day.',
+    goal:'Try one thing that isn’t on the plan — without it wrecking his day.',
     great:'Remembering details, being reliable, anything with clear steps.',
-    talk:'Clear, direct words. Likes to know what\u2019s next.',
+    talk:'Clear, direct words. Likes to know what’s next.',
     tricky:'Surprises and last-minute changes make him anxious.',
     help:'Tell him the plan first. Heads-up before you swap activities. Break it into steps.',
-    dont:'Spring surprises, or say vague things like "we\u2019ll see".',
-    tell:'If he goes quiet and still, he\u2019s unsure \u2014 calmly give the next step.',
-    ideas:['Wildcard round: run a normal game, then surprise everyone with a bonus twist \u2014 prep Oliver just before.',
-           'Mystery Box: everyone guesses what\u2019s inside before the reveal. The surprise is safe and shared.'] },
+    dont:'Spring surprises, or say vague things like "we’ll see".',
+    tell:'If he goes quiet and still, he’s unsure — calmly give the next step.',
+    ideas:['Wildcard round: run a normal game, then surprise everyone with a bonus twist — prep Oliver just before.',
+           'Mystery Box: everyone guesses what’s inside before the reveal. The surprise is safe and shared.'] },
   { name:'Kelsey', sw:'Ethan', code:'5093', role:'Wants to get it right', moves:'Loads of encouragement — "you’ve got this, I’ll do it with you." Celebrate every attempt: "look at you go, that was awesome!" If she says "I can’t," reframe it: "let’s just try the first little bit together."', test:'I’ll say "I can’t, you do it" and try to hand it straight back to you.',
-    goal:'Have a go at a challenge she thinks she can\u2019t do, and finish it.',
+    goal:'Have a go at a challenge she thinks she can’t do, and finish it.',
     great:'Trying hard, being kind, careful thoughtful work.',
-    talk:'Might say "I can\u2019t" when she means "I\u2019m scared to".',
+    talk:'Might say "I can’t" when she means "I’m scared to".',
     tricky:'Worries about getting things wrong or being watched.',
-    help:'Break it into tiny steps. Cheer every attempt. Remind her there\u2019s no wrong way. Go first with her.',
+    help:'Break it into tiny steps. Cheer every attempt. Remind her there’s no wrong way. Go first with her.',
     dont:'Rush her or say "hurry up".',
-    tell:'If she hangs back or says "I can\u2019t", offer a smaller first step.',
-    ideas:['Everyone-finishes relay: a short course the whole group completes \u2014 you cheer her through each step.',
-           'Group dare (sour lolly or silly pose): everyone has a go together, so she isn\u2019t alone in it.'] },
+    tell:'If she hangs back or says "I can’t", offer a smaller first step.',
+    ideas:['Everyone-finishes relay: a short course the whole group completes — you cheer her through each step.',
+           'Group dare (sour lolly or silly pose): everyone has a go together, so she isn’t alone in it.'] },
   { name:'Tui', sw:'Lily', code:'6417', role:'Always on the move', moves:'Keep it playful and stay connected — "stick with me, I need my buddy!" Praise staying close: "awesome staying with the group, Tui!" If they start to drift, redirect with interest: "ooh, come check this out with me first."', test:'I’ll drift off mid-activity to "check something" — just to see if you notice.',
     goal:'Stay with the group for a whole challenge, and tell someone before heading off.',
     great:'Exploring, spotting interesting things, being brave and independent.',
-    talk:'Fine \u2014 but heads for whatever catches the eye without a word.',
+    talk:'Fine — but heads for whatever catches the eye without a word.',
     tricky:'Wanders off when excited, curious, or a bit overwhelmed.',
-    help:'Stay close and keep Tui in sight. Agree a meet-up spot. Bring what\u2019s caught their eye into the activity.',
-    dont:'Let Tui out of your sight, or grab them suddenly \u2014 it panics them.',
-    tell:'If Tui goes quiet and eyes something far off, they\u2019re about to head for it \u2014 move beside them.',
+    help:'Stay close and keep Tui in sight. Agree a meet-up spot. Bring what’s caught their eye into the activity.',
+    dont:'Let Tui out of your sight, or grab them suddenly — it panics them.',
+    tell:'If Tui goes quiet and eyes something far off, they’re about to head for it — move beside them.',
     ideas:['Stick-together scavenger: find items as one team, no splitting up.',
            'Circle game (pass-the-move or parachute): everyone stays in one spot together.'] },
   { name:'Rangi', sw:'Teri', code:'3826', role:'Do it my way', moves:'Keep it light and hand him the power — "reckon you could do it your way?" Use humour, offer choices, never orders. Praise his ideas: "love it, great call Rangi!"', test:'Tell me to do it and I’ll do the opposite. Cheekily. "Make me."',
     goal:'Fully join a challenge that he picked himself.',
-    great:'Creative ideas, humour, going all-in when it\u2019s his idea.',
+    great:'Creative ideas, humour, going all-in when it’s his idea.',
     talk:'Says yes to invitations, no to orders.',
     tricky:'Being told "you have to" makes him want to do the opposite.',
     help:'Offer choices, not commands. Use humour. Make it feel like his idea ("this or that?").',
     dont:'Give direct demands or use countdowns as pressure.',
     tell:'If he digs his heels in, back off and offer a choice.',
     ideas:['You-choose challenge: offer the group two games and let them pick.',
-           'Make-the-rules game: the group invents the rules together \u2014 everyone\u2019s idea.'] },
+           'Make-the-rules game: the group invents the rules together — everyone’s idea.'] },
   { name:'Harry', sw:'Heath', code:'7150', role:'Needs calm', moves:'Make sure he feels validated — let him know it’s okay to feel sad or upset, but he needs to use his words to tell you: "it’s okay to feel like that — can you use your words to tell me what’s up?"', test:'When it gets loud I’ll go "nope, too much" and start to leave.',
     goal:'Get through a loud, busy challenge by taking a break when he needs one.',
     great:'Focusing in calm spaces, noticing detail, being thoughtful.',
-    talk:'Quietly \u2014 might need a break from noise before he can chat.',
+    talk:'Quietly — might need a break from noise before he can chat.',
     tricky:'Loud noise and big crowds overwhelm him fast.',
     help:'Keep your voice calm. Offer a quieter spot. Let him take breaks. Headphones are okay.',
     dont:'Make sudden loud noises, or force him to stay in the busy area.',
@@ -330,7 +338,7 @@ const P = [
   { name:'Jack', sw:'Max', code:'1592', role:'Full of go', moves:'Channel the energy and keep it upbeat — "you’re my demonstrator, show everyone how it’s done!" Praise waiting and listening: "awesome waiting, Jack — nice one!" Keep directions short and punchy.', test:'I’ll talk over your instructions and try to bolt before you finish.',
     goal:'Wait his turn and listen to the whole instructions before he starts.',
     great:'Energy, enthusiasm, being brave, getting things started.',
-    talk:'Fast \u2014 and might blurt things out. Keen, not rude.',
+    talk:'Fast — and might blurt things out. Keen, not rude.',
     tricky:'Long instructions and waiting for his turn.',
     help:'Keep instructions short. Give him a job or something to do with his hands. Quick turns.',
     dont:'Make him sit still and listen for a long time.',
@@ -338,32 +346,32 @@ const P = [
     ideas:['Relay race: clear turns and a job while waiting.',
            'Simon Says / listen-then-go: you only move after the full instruction.'] },
   { name:'Kellie', sw:'Lucy', code:'9264', role:'Say what you mean', moves:'She loves jokes and silliness. If she’s feeling sad or stuck, crack a few jokes to lift her — a good laugh brings her right back.', test:'I’ll do exactly what you say — so "give us a hand" gets you one hand.',
-    goal:'Ask "what do you mean?" when she\u2019s unsure, instead of guessing.',
+    goal:'Ask "what do you mean?" when she’s unsure, instead of guessing.',
     great:'Honesty, following clear instructions exactly, spotting details.',
-    talk:'Takes words literally \u2014 might not get jokes or sayings.',
+    talk:'Takes words literally — might not get jokes or sayings.',
     tricky:'Sarcasm, hints, and sayings like "pull your socks up" confuse her.',
-    help:'Say exactly what you mean. Skip the idioms. Check she\u2019s understood.',
+    help:'Say exactly what you mean. Skip the idioms. Check she’s understood.',
     dont:'Use sarcasm or vague hints and expect her to guess.',
     tell:'If she looks confused or does something oddly literal, rephrase it plainly.',
-    ideas:['Blind-drawing game: one describes, others draw \u2014 asking "what do you mean?" wins.',
+    ideas:['Blind-drawing game: one describes, others draw — asking "what do you mean?" wins.',
            'Tricky-instructions challenge: vague steps, so asking to clarify wins.'] },
   { name:'Madi', sw:'Teahgan', code:'4738', role:'Warms up in her own time', moves:'Big on positive reinforcement — "well done Madi, that’s awesome!" If she’s not listening, gently remind her of the rules: "remember, we need to focus on our goals," or "let’s focus on good listening."', test:'Rush me and I’ll shrink back and go quiet. I move in my own time.',
     goal:'Join in one challenge in front of the whole group.',
     great:'Watching and learning, thoughtful ideas, loyalty once she trusts you.',
-    talk:'Not much at first \u2014 she watches before she joins.',
-    tricky:'Being put on the spot or pushed to join before she\u2019s ready.',
+    talk:'Not much at first — she watches before she joins.',
+    tricky:'Being put on the spot or pushed to join before she’s ready.',
     help:'Let her watch first. Invite her gently. Give her a small, low-key role to start.',
     dont:'Spotlight her early or say "come on, just do it".',
-    tell:'If she\u2019s hovering at the edge, give her a watching-job, then invite her in.',
+    tell:'If she’s hovering at the edge, give her a watching-job, then invite her in.',
     ideas:['Add-a-move circle: she can start by watching, then join with a tiny part.',
            'Group charades: begin in a support role and build up to acting one out.'] },
   { name:'Ashleigh', sw:'Yuna', code:'8305', role:'Big feelings, big heart', moves:'Validate the feeling first — "that’s really frustrating, hey, I get it." Stay calm and co-regulate, then offer a reset: "let’s take a breath and try a smaller bit." Praise her when she resets: "amazing job calming yourself, Ashleigh!"', test:'When it goes wrong I’ll huff "I give up, I quit" and down tools.',
-    goal:'Spot when she\u2019s getting frustrated and take a reset instead of quitting.',
+    goal:'Spot when she’s getting frustrated and take a reset instead of quitting.',
     great:'Determination, caring about others, never giving up.',
-    talk:'When it\u2019s going well, heaps! When frustrated, it gets short.',
-    tricky:'When things don\u2019t work, frustration builds and she might want to quit.',
-    help:'Stay calm. Name the feeling ("that\u2019s frustrating, hey"). Offer a breath or a break, then a smaller step.',
-    dont:'Tell her to "calm down", or push her when she\u2019s boiling over.',
+    talk:'When it’s going well, heaps! When frustrated, it gets short.',
+    tricky:'When things don’t work, frustration builds and she might want to quit.',
+    help:'Stay calm. Name the feeling ("that’s frustrating, hey"). Offer a breath or a break, then a smaller step.',
+    dont:'Tell her to "calm down", or push her when she’s boiling over.',
     tell:'If her voice rises or she huffs, stay calm, offer a reset, then try a smaller step.',
     ideas:['Tallest tower with a "reset breath" rule for the whole team.',
            'Puzzle race with breather breaks built in.'] },
@@ -378,7 +386,7 @@ function SupportList({p}){
       <div className="kv"><div className="k">Tricky</div><div className="v">{p.tricky}</div></div>
       <div className="kv"><div className="k helps">Helps</div><div className="v">{p.help}</div></div>
       <div className="kv"><div className="k moves">In the moment</div><div className="v">{p.moves}</div></div>
-      <div className="kv"><div className="k dont">Don\u2019t</div><div className="v">{p.dont}</div></div>
+      <div className="kv"><div className="k dont">Don’t</div><div className="v">{p.dont}</div></div>
       <div className="kv"><div className="k watch">Watch for</div><div className="v">{p.tell}</div></div>
       <div className="kv"><div className="k test">Tests you</div><div className="v">{p.test}</div></div>
     </div>
@@ -533,7 +541,7 @@ function Briefing({teen, onDone}){
           <span className="logo sm"></span>
           <div><div className="lab-t">Coach's Idea Lab</div><div className="lab-s">Brainstorm your challenge — I'll help you make it fit their goal.</div></div>
         </div>
-        <div className="lab-chat"><ChatCoach/></div>
+        <div className="lab-chat"><ChatCoach teen={teen}/></div>
         <button className="brief-next" style={{marginTop:"14px"}} onClick={onDone}>Enter Support Squad</button>
       </div>
     );
@@ -577,8 +585,13 @@ const AI_ENDPOINT="https://weyzaukcbaayxrvtergy.supabase.co/functions/v1/idea-co
 const AI_KEY="sb_publishable_raLOpdCwlwOePnPrUtqZ9g_5zO1zeRy";
 const IDEA_SYSTEM = "You are Coach, a warm, upbeat helper for teenagers who are being support workers for the day at a community program. They are brainstorming a GROUP activity that helps the person they support work on a personal goal (for example: building confidence, waiting their turn, staying with the group, joining in, asking for help, or handling frustration). When they tell you who they are supporting and the goal, suggest 2-3 fun, simple activities the WHOLE group can do together that gently give their person a chance to practise that goal. Keep activities doable at a park with basic materials like balls, chalk, paper or cones. Be encouraging, warm and concise. Keep everything age-appropriate, kind, inclusive and safe, and never suggest anything risky. When it fits, gently remind them of the golden rule: encourage and guide, do not do it for them.";
 
-function ChatCoach(){
-  const [msgs,setMsgs]=useState([{role:"assistant",content:"Hey! I'm Coach. Ask me about who you're supporting — their goal, what helps, or run an activity idea past me and I'll tell you if it fits."}]);
+function ChatCoach({teen}){
+  const me=P.find(x=>x.sw===teen);
+  const person=me?me.name:null;
+  const greet=person
+    ? "Hey "+teen+"! You're supporting "+person+" today. Ask me anything about helping "+person+", or run an activity idea past me and I'll tell you if it fits."
+    : "Hey! Ask me about who you're supporting — their goal, what helps, or run an activity idea past me and I'll tell you if it fits.";
+  const [msgs,setMsgs]=useState([{role:"assistant",content:greet}]);
   const [input,setInput]=useState("");
   const [loading,setLoading]=useState(false);
   const [err,setErr]=useState("");
@@ -593,7 +606,7 @@ function ChatCoach(){
       const res=await fetch(AI_ENDPOINT,{
         method:"POST",
         headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_KEY,"apikey":AI_KEY},
-        body:JSON.stringify({ messages:api.map(m=>({role:m.role,content:m.content})) })
+        body:JSON.stringify({ messages:api.map(m=>({role:m.role,content:m.content})), supporting: person })
       });
       if(!res.ok) throw new Error("http "+res.status);
       const data=await res.json();
@@ -659,7 +672,7 @@ function Home({teen, onOpenShift, onLogout}){
                   <div className="a"><b>{p.sw}</b> supporting {p.name}</div>
                   <div className="b">{p.role}</div>
                 </span>
-                <span className="chev">\u203A</span>
+                <span className="chev">›</span>
               </button>
             ))}
           </React.Fragment>
@@ -667,7 +680,7 @@ function Home({teen, onOpenShift, onLogout}){
 
         {tab==='ideas' && (
           <React.Fragment>
-            <div className="sect-lbl">// ideas for the activity you\u2019ll design</div>
+            <div className="sect-lbl">// ideas for your activity — real Yeronga Park spots up top</div>
             {ACTIVITIES.map((a,i)=>(
               <div className="idea" key={i}>
                 <div className="nm">{a.nm}</div>
@@ -678,19 +691,19 @@ function Home({teen, onOpenShift, onLogout}){
           </React.Fragment>
         )}
 
-        {tab==='chat' && <ChatCoach/>}
+        {tab==='chat' && <ChatCoach teen={teen}/>}
       </main>
 
       {card && (
         <div className="ov" onClick={()=>setCard(null)}>
           <div className="ov-card" onClick={e=>e.stopPropagation()}>
-            <button className="ov-x" onClick={()=>setCard(null)}>\u2715</button>
+            <button className="ov-x" onClick={()=>setCard(null)}>✕</button>
             <div className="phero" style={{marginTop:'6px'}}>
               <span className="av">{card.name[0]}</span>
               <span><div className="lab">{card.sw} is supporting</div><div className="nm">{card.name}</div><div className="rl">{card.role}</div></span>
             </div>
             <SupportList p={card}/>
-            <div className="rule">This is the card everyone can see \u2014 including how they\u2019ll test you. Your own goal & task are in <b>your</b> shift.</div>
+            <div className="rule">This is the card everyone can see — including how they’ll test you. Your own goal & task are in <b>your</b> shift.</div>
           </div>
         </div>
       )}
@@ -710,10 +723,10 @@ function Login({onLogin}){
       <div className="logo lg" style={{margin:'0 auto 18px'}}></div>
       <h2>Sign in</h2>
       <p>Enter your personal code to start your shift.</p>
-      <input className={'pin '+(err?'err':'')} inputMode="numeric" maxLength="4" placeholder="\u2022\u2022\u2022\u2022"
+      <input className={'pin '+(err?'err':'')} inputMode="numeric" maxLength="4" placeholder="••••"
         value={pin} onChange={e=>setPin(e.target.value.replace(/[^0-9]/g,''))}
         onKeyDown={e=>{if(e.key==='Enter') submit();}} />
-      <div className="errmsg">{err?'That code didn\u2019t match \u2014 try again.':''}</div>
+      <div className="errmsg">{err?'That code didn’t match — try again.':''}</div>
       <button className="cta" style={{margin:0,width:'100%'}} onClick={submit}>Sign in</button>
     </div>
   );
@@ -738,19 +751,19 @@ function ShiftView({p, onBack}){
     <React.Fragment>
       <div className="top">
         <div className="brand"><div className="logo sm"></div>
-          <div><div className="nm">SWAP SQUAD</div><div className="sub">{p.sw}\u2019s shift</div></div></div>
+          <div><div className="nm">SWAP SQUAD</div><div className="sub">{p.sw}’s shift</div></div></div>
         <button className="btn-sm grey" onClick={onBack}>Back</button>
       </div>
       <main>
         <div className="summary">
-          <div className="when">THU 9 JULY \u00b7 09:00\u201315:00 \u00b7 SWAP SQUAD</div>
+          <div className="when">THU 9 JULY · 09:00\u201315:00 · SWAP SQUAD</div>
           <div className="row2"><div className="svc">Community Access</div>
-            <div className={'pill '+(signedOn?'on':'')}>{signedOn?('On shift \u00b7 '+signAt):'Upcoming'}</div></div>
-          <button className={'signbtn '+(signedOn?'on':'')} onClick={toggleSign}>{signedOn?'\u2713 Signed on \u2014 tap to sign off':'Sign on to shift'}</button>
+            <div className={'pill '+(signedOn?'on':'')}>{signedOn?('On shift · '+signAt):'Upcoming'}</div></div>
+          <button className={'signbtn '+(signedOn?'on':'')} onClick={toggleSign}>{signedOn?'✓ Signed on — tap to sign off':'Sign on to shift'}</button>
         </div>
 
         <div className="phero"><span className="av">{p.name[0]}</span>
-          <span><div className="lab">You\u2019re supporting</div><div className="nm">{p.name}</div><div className="rl">{p.role}</div></span></div>
+          <span><div className="lab">You’re supporting</div><div className="nm">{p.name}</div><div className="rl">{p.role}</div></span></div>
 
         <div className="tabs">
           {[['shift','Shift'],['participant','Participant'],['task','My Task']].map(([id,l])=>(
@@ -761,17 +774,17 @@ function ShiftView({p, onBack}){
         {tab==='shift' && (
           <React.Fragment>
             <div className="pickup"><div className="k">Pickup</div>
-              <div className="v">{p.name} is driving today \u2014 meet at Yeronga Memorial Park by <b>9:30</b>. Your shift starts the moment you meet.</div></div>
+              <div className="v">{p.name} is driving today — meet at Yeronga Memorial Park by <b>9:30</b>. Your shift starts the moment you meet.</div></div>
             <div className="card"><h3>Run of the day</h3>
               <div className="tl">{DAY.map((r,i)=>(<div className="r" key={i}><div className="t">{r.t}</div><div className="d" dangerouslySetInnerHTML={{__html:r.d}}></div></div>))}</div></div>
-            <div className="rule">Golden rule: <b>encourage and guide \u2014 don\u2019t do it for them.</b></div>
+            <div className="rule">Golden rule: <b>encourage and guide — don’t do it for them.</b></div>
           </React.Fragment>
         )}
 
         {tab==='participant' && (
           <React.Fragment>
-            <div className="goalbox"><div className="k">{p.name}\u2019s goal today</div><div className="v">{p.goal}</div></div>
-            <div className="pickup" style={{background:'rgba(167,139,250,.09)',borderColor:'rgba(167,139,250,.3)'}}><div className="k" style={{color:'#A78BFA'}}>Heads up</div><div className="v">{p.name} will push back and be a bit cheeky today. Use what you know to win them over \u2014 don\u2019t just do it for them.</div></div>
+            <div className="goalbox"><div className="k">{p.name}’s goal today</div><div className="v">{p.goal}</div></div>
+            <div className="pickup" style={{background:'rgba(167,139,250,.09)',borderColor:'rgba(167,139,250,.3)'}}><div className="k" style={{color:'#A78BFA'}}>Heads up</div><div className="v">{p.name} will push back and be a bit cheeky today. Use what you know to win them over — don’t just do it for them.</div></div>
             <SupportList p={p}/>
           </React.Fragment>
         )}
@@ -782,9 +795,9 @@ function ShiftView({p, onBack}){
             <div className="card"><h3>Design an activity the whole group can do</h3>
               <ul className="ideas">{p.ideas.map((x,i)=><li key={i}>{x}</li>)}</ul></div>
             <div className="card"><h3>Your plan</h3>
-              <textarea className="ta" placeholder={'What\u2019s your activity? How does it help '+p.name+' with their goal?'}
+              <textarea className="ta" placeholder={'What’s your activity? How does it help '+p.name+' with their goal?'}
                 value={activity} onChange={e=>setActivity(e.target.value)}></textarea>
-              <div className="savednote">{activity?'saved on this device':'type your idea \u2014 it saves as you go'}</div></div>
+              <div className="savednote">{activity?'saved on this device':'type your idea — it saves as you go'}</div></div>
           </React.Fragment>
         )}
       </main>
